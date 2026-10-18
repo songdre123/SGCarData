@@ -1,0 +1,27 @@
+name: Ingest monthly LTA PDFs
+on:
+  push:
+    paths: ["incoming/**", "lookups.json"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: ingest
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pdfplumber openpyxl
+      - name: Parse, validate, archive, rebuild
+        run: python scripts/ingest.py
+      - name: Commit the new data
+        if: success()
+        run: |
+          git config user.name "data-bot"
+          git config user.email "data-bot@users.noreply.github.com"
+          git add -A site/data archive incoming
+          git diff --cached --quiet || git commit -m "Data update from LTA PDFs"
+          git push
