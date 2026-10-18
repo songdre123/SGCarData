@@ -1,1 +1,108 @@
-<!doctype html><meta charset="utf-8"><title>LTA dashboard</title><h1>Coming soon</h1>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LTA Car Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <h1>SG Car Data Dashboard</h1>
+    <p class="sub">Singapore LTA car registrations &amp; car cost tracker</p>
+  </div>
+  <div class="header-actions">
+    <span class="last-update" id="lastUpdate">Loading…</span>
+    <a class="btn" href="data/registrations.json" download>Download data</a>
+  </div>
+</header>
+
+<main>
+  <section class="kpi-grid" id="kpiGrid"></section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Monthly Registrations</h2>
+      <div class="filters" id="chartFilters">
+        <label><input type="checkbox" value="Petrol" checked> Petrol</label>
+        <label><input type="checkbox" value="Petrol-Electric" checked> Petrol-Electric</label>
+        <label><input type="checkbox" value="Petrol-Electric (Plug-in)" checked> Plug-in Hybrid</label>
+        <label><input type="checkbox" value="Electric" checked> Electric</label>
+        <label><input type="checkbox" value="Diesel" checked> Diesel</label>
+        <label><input type="checkbox" value="Diesel-Electric" checked> Diesel-Electric</label>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Fuel Mix &amp; Body Types</h2>
+    </div>
+    <div class="split">
+      <div class="chart-wrap"><canvas id="fuelChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="bodyChart"></canvas></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Top Makes</h2>
+      <div class="filters">
+        <select id="topMakeMonth">
+          <option value="__all__">All months</option>
+        </select>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="makeChart"></canvas></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Registrations Table</h2>
+      <div class="table-tools">
+        <input type="search" id="tableSearch" placeholder="Search make, fuel, body…">
+        <select id="tableMonth">
+          <option value="__all__">All months</option>
+        </select>
+        <select id="tableMake">
+          <option value="__all__">All makes</option>
+        </select>
+        <select id="tableFuel">
+          <option value="__all__">All fuels</option>
+        </select>
+        <button class="btn ghost" id="resetFilters">Reset</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="dataTable">
+        <thead><tr>
+          <th>Month</th><th>Make</th><th>Importer</th><th>Fuel</th><th>Body</th>
+          <th>Units</th><th>Country</th><th>Tier</th><th>Distributor</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="table-note" id="tableNote"></p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Industry News</h2>
+      <button class="btn ghost" id="addNewsBtn">+ Add News</button>
+    </div>
+    <div class="news-list" id="newsList"></div>
+    <p class="table-note">Tip: add entries to <code>site/data/news.json</code> (title, source, date, url, image, summary).</p>
+  </section>
+</main>
+
+<footer class="topbar">
+  <p>Source: Singapore Land Transport Authority (LTA) — M03 Car Registrations by Make &amp; M032 Car Cost Update.<br>
+  Figures include COE and tax-exempted cars but exclude taxis. PI = parallel imports for market testing / special purposes.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
