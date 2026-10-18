@@ -28,11 +28,12 @@
     <summary class="panel-head">
       <h2>Filter Models</h2>
       <div class="filters" id="costFilters">
+        <select id="costMonth"></select>
         <select id="costMake"><option value="__all__">All makes</option></select>
+        <select id="costModel"><option value="__all__">All models</option></select>
         <select id="costFuel"><option value="__all__">All fuels</option></select>
         <select id="costCat"><option value="__all__">All COE categories</option></select>
         <input type="search" id="costSearch" placeholder="Search model…">
-        <select id="costMonth"></select>
         <button class="btn ghost" id="costReset">Reset</button>
       </div>
     </summary>
@@ -72,7 +73,7 @@
 </main>
 
 <footer class="topbar">
-  <p>Source: Singapore Land Transport Authority (LTA) — M032 Car Cost Update. COE = Certificate of Entitlement, OMV = Open Market Value, ARF = Additional Registration Fee.</p>
+  <p>Source: Singapore Land Transport Authority (LTA) — M032 Car Cost Update.</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>

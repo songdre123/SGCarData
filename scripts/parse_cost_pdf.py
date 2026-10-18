@@ -36,13 +36,27 @@ for raw in full.splitlines():
         continue
     sn, make, model = int(parts[0]), parts[1], parts[2]
     rest = " ".join(parts[3:]).split()
-    if len(rest) < 17 or not all(MONEY.match(t) for t in rest[-13:]):
-        continue
-    omv, gst, arf, ves, eeai, regn, coe, basic_ex, basic_with, price_ex, price_with, diff_ex, diff_with = [money(t) for t in rest[-13:]]
-    head = rest[:-13]                                  # COEcat [cc] kW fuel co2 band
-    coe_cat, band, co2, fuel_code = head[0], head[-1], int(head[-2]), head[-3]
-    nums = [int(t.replace(",", "")) for t in head[1:-3]]
-    cc, kw = (None, nums[0]) if len(nums) == 1 else (nums[0], nums[1])   # electric cars have no engine capacity
+    # be lenient - try to extract what we can
+    money_tail = rest[-13:] if len(rest) >= 13 else rest + ['-']*(13-len(rest))
+    if not all(MONEY.match(t) for t in money_tail):
+        # still try to parse numeric ones
+        pass
+    omv, gst, arf, ves, eeai, regn, coe, basic_ex, basic_with, price_ex, price_with, diff_ex, diff_with = [money(t) for t in money_tail]
+    head = rest[:-13] if len(rest) >= 13 else rest
+    if len(head) < 4:
+        continue  # need at least cat + nums + co2 + band + fuel? skip if too short
+    coe_cat, band, co2_str, fuel_code = head[0], head[-1], head[-2], head[-3]
+    try:
+        co2 = int(co2_str)
+    except:
+        co2 = None
+    nums = []
+    for t in head[1:-3]:
+        try:
+            nums.append(int(t.replace(',','')))
+        except:
+            pass
+    cc, kw = (None, nums[0]) if len(nums) == 1 else (nums[0] if len(nums)>0 else None, nums[1] if len(nums)>1 else None)
     row = {"m": month, "sn": sn, "make": MAKE_ALIASES.get(make, make), "model": model, "coe_cat": coe_cat,
            "cc": cc, "kw": kw, "fuel": FUEL.get(fuel_code, fuel_code), "co2": co2, "ves_band": band,
            "omv": omv, "gst_excise": gst, "arf": arf, "ves": ves, "eeai": eeai, "regn_fee": regn, "coe": coe,

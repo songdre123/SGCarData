@@ -14,13 +14,14 @@ async function load() {
   const lu = $("lastUpdate");
   if (lu) lu.textContent = "Updated " + month;
   initFilters();
+  refreshModels();
   render();
 }
 
 function initFilters() {
   const makes = [...new Set(COSTS.map((r) => r.make))].sort();
   const m = $("costMake");
-  if (m) { makes.forEach((x) => m.add(new Option(x, x))); m.addEventListener("change", render); }
+  if (m) { makes.forEach((x) => m.add(new Option(x, x))); m.addEventListener("change", ()=>{ refreshModels(); render(); }); }
   const fuels = [...new Set(COSTS.map((r) => r.fuel))].sort();
   const f = $("costFuel");
   if (f) { fuels.forEach((x) => f.add(new Option(x, x))); f.addEventListener("change", render); }
@@ -43,6 +44,14 @@ function initFilters() {
       try{ COSTS = await (await fetch("data/costs/"+cm.value+".json")).json(); render(); }catch(e){}
     });
   }
+
+  const cmod = $("costModel");
+  if (cmod) {
+    const models = [...new Set(COSTS.map((r)=>(r.make+"|"+r.model)))].sort().map(x=>x.split("|")[1]);
+    models.forEach(x=>cmod.add(new Option(x,x)));
+    cmod.addEventListener("change", render);
+  }
+
   document.querySelectorAll("#costChartFilters input").forEach((x) => x.addEventListener("change", function(){ renderChart(); }));
 }
 
@@ -52,6 +61,7 @@ function filtered() {
     if ($("costMake") && $("costMake").value !== "__all__" && r.make !== $("costMake").value) return false;
     if ($("costFuel") && $("costFuel").value !== "__all__" && r.fuel !== $("costFuel").value) return false;
     if ($("costCat") && $("costCat").value !== "__all__" && r.coe_cat !== $("costCat").value) return false;
+    if ($("costModel") && $("costModel").value !== "__all__" && r.model !== $("costModel").value) return false;
     if (q && !((r.make + " " + r.model).toLowerCase().includes(q))) return false;
     return true;
   });
@@ -89,7 +99,7 @@ function renderTable(rows) {
     const tr = document.createElement("tr");
     const diff = r.diff_with_coe;
     const diffCell = diff == null ? "—" : (diff >= 0 ? "+" + fmt(diff) : fmt(diff));
-    tr.innerHTML = '<td>' + r.make + '</td><td>' + r.model + '</td><td>' + r.fuel + '</td><td>' + (r.coe_cat || "") + '</td><td>' + fmt(r.cc) + '</td><td>' + fmt(r.kw) + '</td>' +
+    tr.innerHTML = '<td>' + (r.make||"") + '</td><td>' + (r.model||"") + '</td><td>' + (r.fuel||"") + '</td><td>' + (r.coe_cat || "") + '</td><td>' + fmt(r.cc) + '</td><td>' + fmt(r.kw) + '</td>' +
       '<td>' + fmtMoney(r.omv) + '</td><td>' + fmtMoney(r.arf) + '</td><td>' + fmtMoney(r.gst_excise) + '</td><td>' + fmtMoney(r.ves) + '</td><td>' + fmt(r.eeai) + '</td>' +
       '<td>' + fmtMoney(r.regn_fee) + '</td><td>' + fmtMoney(r.coe) + '</td><td>' + fmtMoney(r.basic_ex_coe) + '</td><td>' + fmtMoney(r.basic_with_coe) + '</td>' +
       '<td>' + fmtMoney(r.price_ex_coe) + '</td><td>' + fmtMoney(r.price_with_coe) + '</td><td>' + diffCell + '</td>';
@@ -104,7 +114,14 @@ function renderChart(rowsArg) {
   const ctx = $("costChart");
   if (!ctx) return;
   const rows = rowsArg || filtered();
-  const top = [...rows].filter((r) => r.price_with_coe != null).sort((a, b) => b.price_with_coe - a.price_with_coe).slice(0, 40);
+  // rank by first checked metric if exists, else by price_with_coe
+  const checked = [...document.querySelectorAll("#costChartFilters input")].find(x=>x.checked);
+  const rankField = checked ? checked.value : "price_with_coe";
+  let top = [...rows];
+  top = top.filter(r=>r[rankField] != null && !isNaN(r[rankField]));
+  if (top.length === 0) top = [...rows].slice(0,40);
+  else top.sort((a,b)=>(b[rankField]||0)-(a[rankField]||0)).slice(0,40);
+  top = top.slice(0,40);
   const labels = top.map((r) => r.make + " " + r.model);
   const active = [...document.querySelectorAll("#costChartFilters input")].map((c) => ({ field: c.value, on: c.checked }));
   const palette = ["#4ea1ff", "#7c5cff", "#2ecc71", "#f1c40f"];
@@ -119,6 +136,17 @@ function renderChart(rowsArg) {
   costChart.data.labels = labels;
   costChart.data.datasets = datasets;
   costChart.update();
+}
+
+
+function refreshModels() {
+  const make = $("costMake") ? $("costMake").value : "__all__";
+  const mod = $("costModel");
+  if (!mod) return;
+  mod.innerHTML = '<option value="__all__">All models</option>';
+  let list = COSTS;
+  if (make !== "__all__") list = list.filter(r=>r.make===make);
+  [...new Set(list.map(r=>r.model))].sort().forEach(x=>mod.add(new Option(x,x)));
 }
 
 function chartOpts() {
