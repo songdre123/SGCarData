@@ -1,11 +1,13 @@
 """Parse the LTA monthly 'Cost (S$) For Cars Registered in <Mon YYYY>' PDF (M032) and store it as one file per month.
 Usage: python scripts/parse_cost_pdf.py path/to/M032.pdf
 Needs poppler's `pdftotext` on the PATH (preinstalled on most Linux; `apt install poppler-utils`).
-Writes: site/data/costs/YYYY-MM.json, rebuilds site/data/costs/index.json and site/data/costs_all.json
+Writes site/data/costs/YYYY-MM.json, then rebuilds site/data/cost_history.json and cost_changes.json
 Re-running the same month simply overwrites that month's file (safe to repeat).
 """
 import json, re, subprocess, sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cost_history
 
 SRC = Path(sys.argv[1])
 OUT = Path(__file__).resolve().parent.parent / "site" / "data" / "costs"
@@ -26,6 +28,7 @@ if not m:
     sys.exit("Could not find the month in the PDF title")
 month = f"{m.group(2)}-{MONTHS[m.group(1)]:02d}"
 
+candidates = sum(1 for l in full.splitlines() if re.match(r"^\s*\d{1,4}\s{2,}[A-Z]", l))   # lines that look like model rows
 rows, problems = [], []
 for raw in full.splitlines():
     parts = re.split(r"\s{2,}", raw.strip())          # SN | Make | Model | the rest, single-spaced numbers
@@ -58,12 +61,11 @@ missing = sorted(set(range(1, expected + 1)) - set(sns))
 print(f"month {month}: parsed {len(rows)} models (highest SN {expected}); missing SNs: {missing or 'none'}")
 print("arithmetic problems:", problems or "none")
 print("models with a quoted dealer price:", sum(1 for r in rows if r["price_with_coe"] is not None))
-if missing or problems or len(rows) != expected:
+print(f"lines that look like model rows: {candidates}")
+if not rows or missing or problems or len(rows) != expected or len(rows) != candidates:
     print("CHECK FAILED - file NOT written"); sys.exit(1)
 
 (OUT / f"{month}.json").write_text(json.dumps(rows, separators=(",", ":")), encoding="utf-8")
-files = sorted(OUT.glob("20??-??.json"))
-(OUT / "index.json").write_text(json.dumps([p.stem for p in files]), encoding="utf-8")
-allrows = [r for p in files for r in json.loads(p.read_text(encoding="utf-8"))]
-(OUT.parent / "costs_all.json").write_text(json.dumps(allrows, separators=(",", ":")), encoding="utf-8")
-print("written:", OUT / f"{month}.json", "| months stored:", [p.stem for p in files], "| ALL CHECKS PASSED")
+print("written:", OUT / f"{month}.json")
+cost_history.rebuild()
+print("ALL CHECKS PASSED")

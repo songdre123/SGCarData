@@ -118,6 +118,10 @@
    "country": "Other",
    "tier": ""
   },
+  "DAIMLER": {
+   "country": "Other",
+   "tier": ""
+  },
   "DATSUN": {
    "country": "Japanese",
    "tier": ""
@@ -160,6 +164,10 @@
   },
   "HONDA": {
    "country": "Japanese",
+   "tier": ""
+  },
+  "HONGQI": {
+   "country": "Chinese",
    "tier": ""
   },
   "HYUNDAI": {
@@ -230,8 +238,16 @@
    "country": "Other",
    "tier": "Premium"
   },
+  "MITSUBISHI": {
+   "country": "Japanese",
+   "tier": ""
+  },
   "MORGAN": {
    "country": "Other",
+   "tier": ""
+  },
+  "NASH": {
+   "country": "American",
    "tier": ""
   },
   "NETA": {
@@ -273,6 +289,10 @@
   "ROLLS ROYCE": {
    "country": "Other",
    "tier": "Luxury"
+  },
+  "SAAB": {
+   "country": "Other",
+   "tier": ""
   },
   "SEAT": {
    "country": "Other",

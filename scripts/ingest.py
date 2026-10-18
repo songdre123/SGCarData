@@ -5,7 +5,7 @@ With no PDFs present it just rebuilds site/data/registrations.json (use after ed
 import shutil, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import store
+import store, cost_history
 
 ROOT = Path(__file__).resolve().parent.parent
 INCOMING, ARCHIVE = ROOT / "incoming", ROOT / "archive"
@@ -26,4 +26,5 @@ for pdf in sorted(INCOMING.glob("*.pdf")):
         print(f"FAILED {pdf.name}: left in incoming/"); failed += 1
 if not failed and any(store.REGN.glob("20??-??.json")):
     store.rebuild()          # always rebuild, so edits to lookups.json also take effect
+    cost_history.rebuild()   # ...and edits to cost_aliases.json
 sys.exit(1 if failed else 0)
