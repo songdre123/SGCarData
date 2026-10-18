@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SG Car Cost Tracker</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <h1>SG Car Cost Tracker</h1>
+    <p class="sub">OMV, ARF, COE, fees, discounts, net price</p>
+  </div>
+  <nav class="header-nav">
+    <a class="nav-link" href="index.html">Registrations Tracker</a>
+    <a class="nav-link active" href="cost.html">Cost Tracker</a>
+    <a class="nav-link" href="blog.html">Blog</a>
+  </nav>
+  <div class="header-actions">
+    <span class="last-update" id="lastUpdate">Loading…</span>
+    <a class="btn ghost" href="data/cost_history.json" download>History</a>
+  </div>
+</header>
+
+<main>
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Key Metrics</h2>
+    </summary>
+    <section class="kpi-grid" id="costKPIs"></section>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Filters</h2>
+      <div class="filters">
+        <input type="search" id="costSearch" placeholder="Search make/model…">
+        <select id="costMake">
+          <option value="__all__">All makes</option>
+        </select>
+        <select id="costFuel">
+          <option value="__all__">All fuels</option>
+        </select>
+        <select id="costCat">
+          <option value="__all__">All COE cats</option>
+        </select>
+        <button class="btn ghost" id="costReset">Reset</button>
+      </div>
+    </summary>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Cost Trends</h2>
+    </summary>
+    <div class="chart-wrap"><canvas id="costTrendChart"></canvas></div>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Cost Breakdown</h2>
+    </summary>
+    <div class="chart-wrap"><canvas id="costBreakdownChart"></canvas></div>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Vehicles</h2>
+    </summary>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Make</th><th>Model</th><th>Fuel</th><th>Cat</th>
+          <th>OMV</th><th>ARF</th><th>COE</th><th>Fees</th><th>Disc.</th><th>Net</th>
+        </tr></thead>
+        <tbody id="costBody"></tbody>
+      </table>
+    </div>
+    <p class="table-note" id="costNote"></p>
+  </details>
+</main>
+
+<footer class="topbar">
+  <p>Data compiled from LTA M032 Car Cost Update. Figures are indicative; refer to official sources.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="cost.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SG Car Data — Blog</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <h1>SG Car Data Blog</h1>
+    <p class="sub">Industry news &amp; analysis</p>
+  </div>
+  <nav class="header-nav">
+    <a class="nav-link" href="index.html">Registrations Tracker</a>
+    <a class="nav-link" href="cost.html">Cost Tracker</a>
+    <a class="nav-link active" href="blog.html">Blog</a>
+  </nav>
+</header>
+
+<main>
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Latest Posts</h2>
+    </summary>
+    <div id="posts" class="news-list"></div>
+  </details>
+</main>
+
+<script type="module">
+  const posts = document.getElementById('posts');
+  // Replace with your Sanity project details
+  const projectId = 'YOUR_SANITY_PROJECT_ID';
+  const dataset = 'production';
+  const query = encodeURIComponent('*[_type=="post"] | order(publishedAt desc){_id, title, slug, publishedAt, excerpt, body}');
+  const url = `https://cdn.sanity.io/v2021-10-21/data/query/${dataset}?query=${query}`;
+
+  async function load() {
+    try {
+      posts.innerHTML = '<p class="table-note">Loading posts...</p>';
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.result || data.result.length === 0) {
+        posts.innerHTML = '<p class="table-note">No posts found. Add posts in Sanity Studio.</p>';
+        return;
+      }
+      posts.innerHTML = data.result.map(p => `
+        <article class="panel">
+          <div class="panel-head"><h3>${escapeHtml(p.title||'')}</h3></div>
+          <p class="table-note">${p.publishedAt ? new Date(p.publishedAt).toLocaleDateString() : ''}</p>
+          <p>${escapeHtml(p.excerpt||'')}</p>
+          ${p.slug ? `<a class="btn" href="post.html?slug=${p.slug.current}">Read more</a>` : ''}
+        </article>
+      `).join('');
+    } catch (e) {
+      posts.innerHTML = '<p class="table-note">Error loading posts. Check projectId/dataset.</p>';
+    }
+  }
+
+  function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[c]))}
+  load();
+</script>
+</body>
+</html>

@@ -12,69 +12,114 @@
     <h1>SG Car Data Dashboard</h1>
     <p class="sub">Singapore LTA car registrations &amp; car cost tracker</p>
   </div>
+  <nav class="header-nav">
+    <a class="nav-link active" href="index.html">Registrations Tracker</a>
+    <a class="nav-link" href="cost.html">Cost Tracker</a>
+    <a class="nav-link" href="blog.html">Blog</a>
+  </nav>
   <div class="header-actions">
     <span class="last-update" id="lastUpdate">Loading…</span>
-    <a class="btn" href="data/registrations.json" download>Download data</a>
+    <a class="btn ghost" href="data/registrations.json" download>Download data</a>
   </div>
 </header>
 
 <main>
-  <section class="kpi-grid" id="kpiGrid"></section>
+  <!-- Global scope selector -->
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Filters &amp; Scope</h2>
+    </summary>
+    <div class="scope-group">
+      <label>Year
+        <select id="scopeYear"></select>
+      </label>
+      <label>Month
+        <select id="scopeMonth">
+          <option value="__all__">All months (YTD)</option>
+        </select>
+      </label>
+      <label class="scope-grouping">Monthly chart grouping
+        <select id="monthlyGroup">
+          <option value="body">Body Type</option>
+          <option value="importer">AMD vs PI</option>
+          <option value="fuel">Fuel Type</option>
+        </select>
+      </label>
+    </div>
+  </details>
 
-  <section class="panel">
-    <div class="panel-head">
+  <!-- YTD KPI cards -->
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Key Metrics</h2>
+    </summary>
+    <section class="kpi-grid" id="kpiGrid"></section>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
       <h2>Monthly Registrations</h2>
-      <div class="filters" id="chartFilters">
-        <label><input type="checkbox" value="Petrol" checked> Petrol</label>
-        <label><input type="checkbox" value="Petrol-Electric" checked> Petrol-Electric</label>
-        <label><input type="checkbox" value="Petrol-Electric (Plug-in)" checked> Plug-in Hybrid</label>
-        <label><input type="checkbox" value="Electric" checked> Electric</label>
-        <label><input type="checkbox" value="Diesel" checked> Diesel</label>
-        <label><input type="checkbox" value="Diesel-Electric" checked> Diesel-Electric</label>
-      </div>
-    </div>
-    <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
-  </section>
+    </summary>
+    <div class="chart-wrap" style="height:460px"><canvas id="monthlyChart"></canvas></div>
+    <p class="table-note" id="monthlyNote"></p>
+  </details>
 
-  <section class="panel">
-    <div class="panel-head">
+  <details class="panel" open>
+    <summary class="panel-head">
       <h2>Fuel Mix &amp; Body Types</h2>
-    </div>
+    </summary>
     <div class="split">
       <div class="chart-wrap"><canvas id="fuelChart"></canvas></div>
       <div class="chart-wrap"><canvas id="bodyChart"></canvas></div>
     </div>
-  </section>
+  </details>
 
-  <section class="panel">
-    <div class="panel-head">
+  <details class="panel" open>
+    <summary class="panel-head">
       <h2>Top Makes</h2>
       <div class="filters">
         <select id="topMakeMonth">
           <option value="__all__">All months</option>
         </select>
       </div>
-    </div>
+    </summary>
     <div class="chart-wrap"><canvas id="makeChart"></canvas></div>
-  </section>
+  </details>
 
-  <section class="panel">
-    <div class="panel-head">
+  <details class="panel" open>
+    <summary class="panel-head">
       <h2>Registrations Table</h2>
       <div class="table-tools">
         <input type="search" id="tableSearch" placeholder="Search make, fuel, body…">
+        <select id="tableYear">
+          <option value="__all__">All years</option>
+        </select>
         <select id="tableMonth">
           <option value="__all__">All months</option>
         </select>
         <select id="tableMake">
           <option value="__all__">All makes</option>
         </select>
+        <select id="tableImporter">
+          <option value="__all__">AMD &amp; PI</option>
+          <option value="AMD">AMD (Official)</option>
+          <option value="PI">PI (Parallel)</option>
+        </select>
+        <select id="tableBody">
+          <option value="__all__">All bodies</option>
+          <option value="SDN">Sedan</option>
+          <option value="SUV">SUV</option>
+          <option value="HB">Hatchback</option>
+          <option value="MPV">MPV</option>
+          <option value="STW">Station Wagon</option>
+          <option value="CPE">Coupe</option>
+        </select>
         <select id="tableFuel">
           <option value="__all__">All fuels</option>
         </select>
         <button class="btn ghost" id="resetFilters">Reset</button>
       </div>
-    </div>
+    </summary>
     <div class="table-wrap">
       <table id="dataTable">
         <thead><tr>
@@ -85,16 +130,15 @@
       </table>
     </div>
     <p class="table-note" id="tableNote"></p>
-  </section>
+  </details>
 
-  <section class="panel">
-    <div class="panel-head">
+  <details class="panel">
+    <summary class="panel-head">
       <h2>Industry News</h2>
-      <button class="btn ghost" id="addNewsBtn">+ Add News</button>
-    </div>
+    </summary>
     <div class="news-list" id="newsList"></div>
-    <p class="table-note">Tip: add entries to <code>site/data/news.json</code> (title, source, date, url, image, summary).</p>
-  </section>
+    <p class="table-note">Tip: edit items at <a href="blog.html">news-admin.html</a>.</p>
+  </details>
 </main>
 
 <footer class="topbar">

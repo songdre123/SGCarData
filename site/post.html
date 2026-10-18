@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SG Car Data — Post</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <h1>SG Car Data Blog</h1>
+    <p class="sub">Industry news &amp; analysis</p>
+  </div>
+  <nav class="header-nav">
+    <a class="nav-link" href="index.html">Registrations Tracker</a>
+    <a class="nav-link" href="cost.html">Cost Tracker</a>
+    <a class="nav-link active" href="blog.html">Blog</a>
+  </nav>
+</header>
+
+<main>
+  <article class="panel">
+    <div class="panel-head"><h2 id="title"></h2></div>
+    <p class="table-note" id="meta"></p>
+    <div id="body"></div>
+    <a class="btn ghost" href="blog.html">Back to blog</a>
+  </article>
+</main>
+
+<script type="module">
+  const title = document.getElementById('title');
+  const meta = document.getElementById('meta');
+  const body = document.getElementById('body');
+  const projectId = 'YOUR_SANITY_PROJECT_ID';
+  const dataset = 'production';
+  const params = new URLSearchParams(location.search);
+  const slug = params.get('slug');
+  if (!slug) { body.textContent='No slug specified'; throw 0; }
+  const query = encodeURIComponent(`*[_type=="post" && slug.current=="${slug}"][0]{title,publishedAt,body}`);
+  const url = `https://cdn.sanity.io/v2021-10-21/data/query/${dataset}?query=${query}`;
+  async function load(){
+    const res = await fetch(url);
+    const data = await res.json();
+    const p = data.result;
+    if(!p){body.textContent='Post not found'; return;}
+    title.textContent = p.title||'';
+    meta.textContent = p.publishedAt?new Date(p.publishedAt).toLocaleDateString():'';
+    body.innerHTML = renderPortableText(p.body||[]);
+  }
+  function renderPortableText(blocks){
+    return (blocks||[]).map(b=>{
+      if(b._type==='block') return '<p>'+escapeHtml(b.children?.map(c=>c.text).join(''))+'</p>';
+      return '';
+    }).join('');
+  }
+  function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[c]))}
+  load();
+</script>
+</body>
+</html>
