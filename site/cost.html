@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SG Car Cost Tracker</title>
+<title>Car Cost Tracker — SG Car Data</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <header class="topbar">
   <div class="brand">
     <h1>SG Car Cost Tracker</h1>
-    <p class="sub">OMV, ARF, COE, fees, discounts, net price</p>
+    <p class="sub">LTA M032 Car Cost Update — OMV, ARF, COE &amp; final prices by model</p>
   </div>
   <nav class="header-nav">
     <a class="nav-link" href="index.html">Registrations Tracker</a>
@@ -26,63 +26,53 @@
 <main>
   <details class="panel" open>
     <summary class="panel-head">
-      <h2>Key Metrics</h2>
-    </summary>
-    <section class="kpi-grid" id="costKPIs"></section>
-  </details>
-
-  <details class="panel" open>
-    <summary class="panel-head">
-      <h2>Filters</h2>
-      <div class="filters">
-        <input type="search" id="costSearch" placeholder="Search make/model…">
-        <select id="costMake">
-          <option value="__all__">All makes</option>
-        </select>
-        <select id="costFuel">
-          <option value="__all__">All fuels</option>
-        </select>
-        <select id="costCat">
-          <option value="__all__">All COE cats</option>
-        </select>
+      <h2>Filter Models</h2>
+      <div class="filters" id="costFilters">
+        <select id="costMake"><option value="__all__">All makes</option></select>
+        <select id="costFuel"><option value="__all__">All fuels</option></select>
+        <select id="costCat"><option value="__all__">All COE categories</option></select>
+        <input type="search" id="costSearch" placeholder="Search model…">
+        <select id="costMonth"></select>
         <button class="btn ghost" id="costReset">Reset</button>
       </div>
     </summary>
+    <div class="kpi-grid" id="costKPIs"></div>
   </details>
 
   <details class="panel" open>
     <summary class="panel-head">
-      <h2>Cost Trends</h2>
+      <h2>Cost Overview</h2>
+      <div class="filters" id="costChartFilters">
+        <label><input type="checkbox" value="basic_with_coe" checked> Basic (with COE)</label>
+        <label><input type="checkbox" value="price_with_coe" checked> Price (with COE)</label>
+        <label><input type="checkbox" value="basic_ex_coe"> Basic (ex COE)</label>
+        <label><input type="checkbox" value="price_ex_coe"> Price (ex COE)</label>
+      </div>
     </summary>
-    <div class="chart-wrap"><canvas id="costTrendChart"></canvas></div>
+    <div class="chart-wrap"><canvas id="costChart"></canvas></div>
   </details>
 
   <details class="panel" open>
     <summary class="panel-head">
-      <h2>Cost Breakdown</h2>
-    </summary>
-    <div class="chart-wrap"><canvas id="costBreakdownChart"></canvas></div>
-  </details>
-
-  <details class="panel" open>
-    <summary class="panel-head">
-      <h2>Vehicles</h2>
+      <h2>Model Cost Breakdown</h2>
+      <span class="table-note" id="costNote"></span>
     </summary>
     <div class="table-wrap">
-      <table>
+      <table id="costTable">
         <thead><tr>
-          <th>Make</th><th>Model</th><th>Fuel</th><th>Cat</th>
-          <th>OMV</th><th>ARF</th><th>COE</th><th>Fees</th><th>Disc.</th><th>Net</th>
+          <th>Make</th><th>Model</th><th>Fuel</th><th>Cat</th><th>CC</th><th>KW</th>
+          <th>OMV</th><th>ARF</th><th>Gst/Excise</th><th>VES</th><th>EEAI</th>
+          <th>Regn Fee</th><th>COE</th><th>Basic ex COE</th><th>Basic with COE</th>
+          <th>Price ex COE</th><th>Price with COE</th><th>Diff</th>
         </tr></thead>
         <tbody id="costBody"></tbody>
       </table>
     </div>
-    <p class="table-note" id="costNote"></p>
   </details>
 </main>
 
 <footer class="topbar">
-  <p>Data compiled from LTA M032 Car Cost Update. Figures are indicative; refer to official sources.</p>
+  <p>Source: Singapore Land Transport Authority (LTA) — M032 Car Cost Update. COE = Certificate of Entitlement, OMV = Open Market Value, ARF = Additional Registration Fee.</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>

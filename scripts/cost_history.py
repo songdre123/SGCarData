@@ -60,3 +60,7 @@ def rebuild():
     (OUT / "cost_changes.json").write_text(json.dumps(changes, separators=(",", ":")), encoding="utf-8")
     print(f"cost history: {len(out)} models, {len(months)} month(s) ({months[0]} to {latest})",
           f"| vs {prev}: {len(changes['new'])} new, {len(changes['removed'])} removed, {len(changes['price_moves'])} price moves" if prev else "")
+
+
+if __name__ == "__main__":
+    rebuild()
