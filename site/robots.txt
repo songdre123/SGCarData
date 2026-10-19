@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sgcardata.com/sitemap.xml
