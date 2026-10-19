@@ -31,6 +31,8 @@
       <nav class="header-nav">
         <a class="nav-link" href="index.html">Registrations Tracker</a>
         <a class="nav-link" href="cost.html">Cost Tracker</a>
+    <a class="nav-link" href="explorer.html?t=pop">Population</a>
+    <a class="nav-link" href="explorer.html?t=trf">Transfers</a>
         <a class="nav-link active" href="blog.html">Blog</a>
       </nav>
     </header>
@@ -49,7 +51,7 @@
       const projectId = "pe0wkv78";
       const dataset = "production";
       const query = encodeURIComponent(
-        '*[_type=="post" && defined(publishedAt)] | order(publishedAt desc){_id, title, slug, publishedAt, excerpt}'
+        '*[_type=="post" && defined(publishedAt)] | order(publishedAt desc){_id, title, slug, publishedAt, excerpt, "img": coverImage.asset->url}'
       );
       const url = `https://${projectId}.apicdn.sanity.io/v2021-10-21/data/query/${dataset}?query=${encodeURIComponent(query)}`;
       async function load() {
@@ -66,7 +68,7 @@
               (p) =>
                 '<article class="panel"><div class="panel-head"><h3>' +
                 escapeHtml(p.title || "") +
-                '</h3></div><p class="table-note">' +
+                '</h3></div>' + (p.img ? '<img class="cover" src="' + p.img + '?w=900&h=500&fit=crop" alt="">' : '') + '<p class="table-note">' +
                 (p.publishedAt
                   ? new Date(p.publishedAt).toLocaleDateString()
                   : "") +

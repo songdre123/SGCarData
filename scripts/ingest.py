@@ -5,7 +5,7 @@ With no PDFs present it just rebuilds site/data/registrations.json (use after ed
 import shutil, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import store, cost_history
+import store, cost_history, sanity
 
 ROOT = Path(__file__).resolve().parent.parent
 INCOMING, ARCHIVE = ROOT / "incoming", ROOT / "archive"
@@ -17,6 +17,8 @@ for pdf in sorted(INCOMING.glob("*.pdf")):
         script = "parse_regn_pdf.py"
     elif "COST (S$) FOR CARS REGISTERED" in head:
         script = "parse_cost_pdf.py"
+    elif "TOTAL CAR POPULATION BY MAKE" in head or "EFFECTIVE TRANSFER OF CAR OWNERSHIP BY MAKE" in head:
+        script = "parse_stats_pdf.py"
     else:
         print(f"SKIPPED {pdf.name}: not a recognised LTA PDF"); failed += 1; continue
     print(f"--- {pdf.name} -> {script}")
@@ -27,4 +29,5 @@ for pdf in sorted(INCOMING.glob("*.pdf")):
 if not failed and any(store.REGN.glob("20??-??.json")):
     store.rebuild()          # always rebuild, so edits to lookups.json also take effect
     cost_history.rebuild()   # ...and edits to cost_aliases.json
+    sanity.run()
 sys.exit(1 if failed else 0)

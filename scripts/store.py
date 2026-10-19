@@ -41,4 +41,6 @@ def rebuild():
     (DATA / "meta.json").write_text(json.dumps({"latest": months[-1], "months": months, "rows": len(rows)}), encoding="utf-8")
     print(f"rebuilt registrations.json: {len(rows)} rows, {len(months)} months ({months[0]} to {months[-1]})")
     if unknown:
-        print("NEW MAKES NOT IN lookups.json (add country/tier):", sorted(unknown))
+        lk["make"].update({m: {"country": "Unknown", "tier": ""} for m in unknown})
+        LOOKUPS.write_text(json.dumps(lk, indent=1, sort_keys=True), encoding="utf-8")
+        print("NEW MAKES ADDED to lookups.json with country 'Unknown'. Open lookups.json and set country/tier for:", sorted(unknown))

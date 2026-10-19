@@ -176,11 +176,8 @@ function renderKPIs() {
 }
 
 function getColor(index) {
-  const palette = [
-    "#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#af7aa1",
-    "#ff9da7", "#9c755f", "#bab0ab", "#6b5b95", "#d64161", "#6a4c93", "#88d8b0"
-  ];
-  return palette[index % palette.length];
+  const p = ["#3ddbb0", "#f2b84b", "#5aa9ff", "#ff6b5e", "#b28cff", "#7ee081", "#ff9f5a", "#4fd1e8", "#e86fa8", "#c3d35a"];
+  return p[index % p.length];
 }
 
 function renderMonthlyBar() {
@@ -452,22 +449,11 @@ function renderTable() {
     return true;
   });
 
-  tbody.innerHTML = rows.slice(0, 500).map((r) => `
-    <tr>
-      <td>${r.m}</td>
-      <td>${r.make}</td>
-      <td>${r.importer}</td>
-      <td>${r.fuel}</td>
-      <td>${r.body}</td>
-      <td class="num">${fmt(r.u)}</td>
-      <td>${r.country || ""}</td>
-      <td>${r.tier || ""}</td>
-      <td>${r.distributor || ""}</td>
-    </tr>
-  `).join("");
-
+  pagedTable($("dataTable"), rows, [
+    { get: r => r.m }, { get: r => r.make }, { get: r => r.importer }, { get: r => r.fuel }, { get: r => r.body },
+    { get: r => r.u, num: 1, sum: 1 }, { get: r => r.country || "" }, { get: r => r.tier || "" }, { get: r => r.distributor || "" }], { reset: true });
   const note = $("tableNote");
-  if (note) note.textContent = `Showing ${fmt(rows.length)} rows${rows.length > 500 ? " (first 500)" : ""}`;
+  if (note) note.textContent = `${fmt(rows.length)} rows match your filters`;
 }
 
 load();
@@ -497,6 +483,9 @@ function renderOverview() {
     if (r.country) totals[r.make].countries.add(r.country);
   });
   const grand = Object.values(totals).reduce((s,x)=>s+x.u,0);
-  const list = Object.entries(totals).map(([k,v])=>({make:k,u:v.u,ev:v.ev,pi:v.pi,c:v.countries.size,pct:grand? (v.u/grand*100):0,pctEv:v.u? (v.ev/v.u*100):0,pctPi:v.u?(v.pi/v.u*100):0})).sort((a,b)=>b.u-a.u).slice(0,30);
-  tbody.innerHTML = list.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+x.make+'</td><td>'+fmt(x.u)+'</td><td>'+x.pct.toFixed(1)+'%</td><td>'+x.pctEv.toFixed(1)+'%</td><td>'+x.pctPi.toFixed(1)+'%</td><td>'+fmt(x.ev)+'</td><td>'+fmt(x.pi)+'</td><td>'+x.c+'</td></tr>').join('');
+  const list = Object.entries(totals).map(([k,v])=>({make:k,u:v.u,ev:v.ev,pi:v.pi,c:v.countries.size,pct:grand? (v.u/grand*100):0,pctEv:v.u? (v.ev/v.u*100):0,pctPi:v.u?(v.pi/v.u*100):0})).sort((a,b)=>b.u-a.u);
+  pagedTable(document.getElementById("overviewTable"), list, [
+    { get: (x, i) => i + 1 }, { get: x => x.make }, { get: x => x.u, num: 1, sum: 1 }, { get: x => x.pct, num: 1, sum: 1, dec: 1, suf: "%" },
+    { get: x => x.pctEv, num: 1, dec: 1, suf: "%" }, { get: x => x.pctPi, num: 1, dec: 1, suf: "%" },
+    { get: x => x.ev, num: 1, sum: 1 }, { get: x => x.pi, num: 1, sum: 1 }, { get: x => x.c, num: 1 }], { reset: true });
 }

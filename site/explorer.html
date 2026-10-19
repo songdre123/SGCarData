@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SG Car Data: population and transfers</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="topbar"><div class="brand"><h1>SG Car Data Dashboard</h1><p class="sub">Singapore LTA car registrations, costs, population and transfers</p></div>
+<nav class="header-nav"><a class="nav-link" href="index.html">Registrations Tracker</a><a class="nav-link" href="cost.html">Cost Tracker</a><a class="nav-link" href="explorer.html?t=pop">Population</a><a class="nav-link" href="explorer.html?t=trf">Transfers</a><a class="nav-link" href="blog.html">Blog</a></nav></header>
+<main>
+<section class="panel"><div class="panel-head"><h2 id="title">Loading</h2>
+ <div class="filters"><select id="fuel"></select><select id="split"><option value="">By make</option><option value="fuel">By make and fuel</option></select>
+ <label id="monthLbl"><select id="month"></select></label><input type="search" id="search" placeholder="Search make"></div></div>
+ <p class="table-note" id="note"></p>
+ <div class="chart-wrap" style="height:min(60vh,520px)"><canvas id="c1"></canvas></div>
+ <div class="chart-wrap" id="c2wrap" style="margin-top:16px"><canvas id="c2"></canvas></div></section>
+<section class="panel"><div class="table-wrap"><table id="tbl"><thead><tr id="heads"></tr></thead><tbody></tbody></table></div></section>
+</main>
+<footer class="topbar"><p>Source: Singapore Land Transport Authority (LTA), Annual and Monthly Vehicle Statistics.</p></footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script><script src="ui.js"></script><script src="explorer.js"></script>
+</body></html>
