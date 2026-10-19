@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="SG Car Data Blog - Industry news and analysis on Singapore car market, registrations, COE and costs.">
+<meta name="keywords" content="Singapore car news, SG car market, COE news, LTA updates">
+<meta property="og:title" content="SG Car Data Blog">
+<meta property="og:description" content="Industry news and analysis on Singapore car market.">
+<meta name="twitter:card" content="summary">
+<meta property="og:type" content="article">
+
 <title>SG Car Data — Blog</title>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -31,7 +38,7 @@
 <script type="module">
   const posts = document.getElementById('posts');
   // Replace with your Sanity project details
-  const projectId = 'YOUR_SANITY_PROJECT_ID';
+  const projectId = 'pe0wkv78';
   const dataset = 'production';
   const query = encodeURIComponent('*[_type=="post"] | order(publishedAt desc){_id, title, slug, publishedAt, excerpt, body}');
   const url = `https://cdn.sanity.io/v2021-10-21/data/query/${dataset}?query=${query}`;

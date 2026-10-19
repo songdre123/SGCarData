@@ -130,6 +130,26 @@ function initFilters() {
   }
   // Last update
   if ($("lastUpdate")) $("lastUpdate").textContent = "Updated " + LATEST;
+
+  // overview filters
+  const ovy2 = $("ovYear");
+  if (ovy2) {
+    const years = [...new Set(MONTHS.map(m=>m.slice(0,4)))].sort();
+    years.forEach(x=>ovy2.add(new Option(x,x)));
+    ovy2.addEventListener("change", renderOverview);
+  }
+  const ovt2 = $("ovTier");
+  if (ovt2) {
+    const tiers = [...new Set(ALL.map(r=>r.tier).filter(Boolean))].sort();
+    tiers.forEach(x=>ovt2.add(new Option(x,x)));
+    ovt2.addEventListener("change", renderOverview);
+  }
+  const ovc2 = $("ovCountry");
+  if (ovc2) {
+    const countries = [...new Set(ALL.map(r=>r.country).filter(Boolean))].sort();
+    countries.forEach(x=>ovc2.add(new Option(x,x)));
+    ovc2.addEventListener("change", renderOverview);
+  }
 }
 
 function render() {
@@ -139,6 +159,7 @@ function render() {
   renderBodyChart();
   renderMakeChart();
   renderTable();
+  renderOverview();
 }
 
 function renderKPIs() {
@@ -219,6 +240,7 @@ function renderMonthlyBar() {
       indexAxis: "y",
       responsive: true,
       maintainAspectRatio: false,
+      resizeDelay: 0,
       plugins: {
         legend: { display: true, position: "bottom", labels: { color: "#9aa3bd" } },
         title: {
@@ -233,11 +255,16 @@ function renderMonthlyBar() {
           callbacks: {
             label: function(context) {
               const label = context.dataset.label || "";
-              const value = context.parsed.x || 0;
-              const total = context.chart._metasets[context.datasetIndex].total || context.parsed._stacksY?.[context.datasetIndex] || 0;
-              const makeTotal = context.chart.data.datasets.reduce((s, ds) => s + (ds.data[context.dataIndex] || 0), 0);
-              const p = makeTotal ? (value / makeTotal) * 100 : 0;
-              return label + ": " + fmt(value) + " (" + p.toFixed(1) + "% of make)";
+              const value = context.parsed?.x ?? 0;
+              const idx = context.dataIndex;
+              let makeTotal = 0;
+              const datasets = context.chart.data.datasets || [];
+              for (let i=0;i<datasets.length;i++) {
+                const d = datasets[i].data || [];
+                makeTotal += Number(d[idx]) || 0;
+              }
+              const p = makeTotal > 0 ? (value / makeTotal) * 100 : 0;
+              return label + ": " + fmt(value) + " (" + p.toFixed(1) + "% of make, total " + fmt(makeTotal) + ")";
             }
           }
         },
@@ -250,7 +277,7 @@ function renderMonthlyBar() {
         },
         y: {
           stacked: true,
-          ticks: { color: "#9aa3bd" },
+          ticks: { color: "#9aa3bd", autoSkip: false, maxRotation: 0, font: { size: 9 } },
           grid: { display: false },
         },
       },
@@ -284,15 +311,17 @@ function renderFuelChart() {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
       plugins: {
         legend: { display: true, position: "bottom", labels: { color: "#9aa3bd" } },
         title: { display: true, text: "Fuel Mix", color: "#e7e9ee" },
         tooltip: {
           callbacks: {
             label: function(context) {
-              const total = context.dataset.data.reduce((a,b)=>a+(b||0),0);
+              const total = context.dataset.data.reduce((a,b)=>a+(Number(b)||0),0);
               const v = context.parsed || 0;
-              return context.label + ": " + fmt(v) + " (" + (total?(v/total*100).toFixed(1):0) + "%)";
+              return context.label + ": " + fmt(v) + " (" + (total?((v/total)*100).toFixed(1):0) + "% of total)";
             }
           }
         }
@@ -324,6 +353,7 @@ function renderBodyChart() {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         title: { display: true, text: "Body Types", color: "#e7e9ee" },
@@ -374,6 +404,7 @@ function renderMakeChart() {
     options: {
       indexAxis: "y",
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         title: { display: true, text: "Top Makes", color: "#e7e9ee" },
@@ -445,4 +476,27 @@ function pctOfTotal(total, v) {
   if (!total || !v) return "";
   const p = (v / total) * 100;
   return " (" + p.toFixed(1) + "%)";
+}
+
+function renderOverview() {
+  const tbody = document.querySelector("#overviewTable tbody");
+  if (!tbody) return;
+  let rows = scopeRows();
+  const ovy = $("ovYear") ? $("ovYear").value : $("scopeYear") ? $("scopeYear").value : "__all__";
+  if (ovy !== "__all__") rows = rows.filter(r=>r.m.slice(0,4)===ovy);
+  const ovt = $("ovTier") ? $("ovTier").value : "__all__";
+  const ovc = $("ovCountry") ? $("ovCountry").value : "__all__";
+  const totals = {};
+  rows.forEach(r=>{
+    if (ovt !== "__all__" && r.tier !== ovt) return;
+    if (ovc !== "__all__" && r.country !== ovc) return;
+    totals[r.make] = totals[r.make] || {u:0,ev:0,pi:0,countries:new Set()};
+    totals[r.make].u += (r.u||0);
+    if (r.fuel==="Electric") totals[r.make].ev += (r.u||0);
+    if (r.importer==="PI") totals[r.make].pi += (r.u||0);
+    if (r.country) totals[r.make].countries.add(r.country);
+  });
+  const grand = Object.values(totals).reduce((s,x)=>s+x.u,0);
+  const list = Object.entries(totals).map(([k,v])=>({make:k,u:v.u,ev:v.ev,pi:v.pi,c:v.countries.size,pct:grand? (v.u/grand*100):0,pctEv:v.u? (v.ev/v.u*100):0,pctPi:v.u?(v.pi/v.u*100):0})).sort((a,b)=>b.u-a.u).slice(0,30);
+  tbody.innerHTML = list.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+x.make+'</td><td>'+fmt(x.u)+'</td><td>'+x.pct.toFixed(1)+'%</td><td>'+x.pctEv.toFixed(1)+'%</td><td>'+x.pctPi.toFixed(1)+'%</td><td>'+fmt(x.ev)+'</td><td>'+fmt(x.pi)+'</td><td>'+x.c+'</td></tr>').join('');
 }

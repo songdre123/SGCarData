@@ -239,7 +239,37 @@ code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-si
   .kpi-grid { grid-template-columns: 1fr; }
   .table-wrap { overflow-x: auto; }
   table { min-width: 720px; }
-  .chart-wrap { height: 340px !important; }
+  .chart-wrap { height: clamp(240px, 50vh, 380px) !important; }
 }
 
 .chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+.chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+.panel .chart-wrap { max-width: 1100px; margin: 0 auto; }
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details > summary::after {
+  content: "▾";
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+details[open] > summary::after {
+  transform: rotate(0deg);
+}
+details:not([open]) > summary::after {
+  transform: rotate(-90deg);
+}
+
+summary.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}

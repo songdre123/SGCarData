@@ -41,7 +41,7 @@ function initFilters() {
     HISTORY.months.slice().reverse().forEach(x=>cm.add(new Option(x,x)));
     cm.value = HISTORY.months[HISTORY.months.length-1];
     cm.addEventListener("change", async ()=>{
-      try{ COSTS = await (await fetch("data/costs/"+cm.value+".json")).json(); render(); }catch(e){}
+      try{ COSTS = await (await fetch("data/costs/"+cm.value+".json")).json(); refreshModels(); render(); }catch(e){}
     });
   }
 
@@ -120,18 +120,17 @@ function renderChart(rowsArg) {
   let top = [...rows];
   top = top.filter(r=>r[rankField] != null && !isNaN(r[rankField]));
   if (top.length === 0) top = [...rows].slice(0,40);
-  else top.sort((a,b)=>(b[rankField]||0)-(a[rankField]||0)).slice(0,40);
-  top = top.slice(0,40);
+  else { top = top.sort((a,b)=>(b[rankField]||0)-(a[rankField]||0)).slice(0,40); }
   const labels = top.map((r) => r.make + " " + r.model);
   const active = [...document.querySelectorAll("#costChartFilters input")].map((c) => ({ field: c.value, on: c.checked }));
   const palette = ["#4ea1ff", "#7c5cff", "#2ecc71", "#f1c40f"];
   const datasets = [];
   active.forEach((a, i) => {
     if (!a.on) return;
-    datasets.push({ label: a.field, data: top.map((r) => r[a.field]), backgroundColor: palette[i] + "22", borderColor: palette[i], borderWidth: 1 });
+    datasets.push({ label: a.field, data: top.map((r) => (r[a.field]!=null&&!isNaN(r[a.field])?r[a.field]:0)), backgroundColor: palette[i] + "22", borderColor: palette[i], borderWidth: 1 });
   });
   if (!costChart) {
-    costChart = new Chart(ctx, { type: "bar", data: { labels: [], datasets: [] }, options: chartOpts() });
+    costChart = new Chart(ctx, { type: "bar", data: { labels: [], datasets: [] }, options: Object.assign({responsive:true,maintainAspectRatio:false,resizeDelay:0}, chartOpts()) });
   }
   costChart.data.labels = labels;
   costChart.data.datasets = datasets;
@@ -153,7 +152,9 @@ function chartOpts() {
   return {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: "#e8ecf5" } } },
+    resizeDelay: 0,
+    interaction: { mode: "index", intersect: false },
+    plugins: { legend: { labels: { color: "#e8ecf5" } }, tooltip: { mode: "index", intersect: false } },
     scales: {
       x: { ticks: { color: "#9aa3bd", maxRotation: 45, font: { size: 10 } }, grid: { display: false } },
       y: { ticks: { color: "#9aa3bd", callback: (v) => "$" + (v / 1000) + "k" }, grid: { color: "#2c3557" } },

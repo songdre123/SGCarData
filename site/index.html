@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="SG Car Data Dashboard - Singapore LTA car registrations (M03) and car cost tracker (M032). Explore monthly registrations by make, fuel, body, AMD/PI with charts, tables and make overview.">
+<meta name="keywords" content="Singapore cars, LTA car registrations, SG car sales, COE, car cost Singapore, LTA M03, LTA M032, car data dashboard">
+<meta property="og:title" content="SG Car Data Dashboard">
+<meta property="og:description" content="Singapore LTA car registrations and car cost tracker with interactive charts and tables.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SG Car Data Dashboard">
+<meta name="twitter:description" content="Singapore LTA car registrations and car cost tracker.">
+
+
 <title>LTA Car Dashboard</title>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -58,9 +68,28 @@
 
   <details class="panel" open>
     <summary class="panel-head">
+      <h2>Make Overview (YTD)</h2>
+      <div class="filters">
+        <select id="ovYear"><option value="__all__">All years</option></select>
+        <select id="ovTier"><option value="__all__">All tiers</option></select>
+        <select id="ovCountry"><option value="__all__">All countries</option></select>
+      </div>
+    </summary>
+    <div class="table-wrap">
+      <table id="overviewTable">
+        <thead><tr>
+          <th>Rank</th><th>Make</th><th>Units</th><th>% of total</th><th>% EV</th><th>% PI</th><th>EV units</th><th>PI units</th><th>Countries</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
       <h2>Monthly Registrations</h2>
     </summary>
-    <div class="chart-wrap" style="height:460px"><canvas id="monthlyChart"></canvas></div>
+    <div class="chart-wrap" ><canvas id="monthlyChart"></canvas></div>
     <p class="table-note" id="monthlyNote"></p>
   </details>
 
@@ -83,7 +112,7 @@
         </select>
       </div>
     </summary>
-    <div class="chart-wrap"><canvas id="makeChart"></canvas></div>
+    <div class="chart-wrap" style="height: min(45vh, 420px);"><canvas id="makeChart"></canvas></div>
   </details>
 
   <details class="panel" open>
@@ -132,13 +161,7 @@
     <p class="table-note" id="tableNote"></p>
   </details>
 
-  <details class="panel">
-    <summary class="panel-head">
-      <h2>Industry News</h2>
-    </summary>
-    <div class="news-list" id="newsList"></div>
-    <p class="table-note">Tip: edit items at <a href="blog.html">news-admin.html</a>.</p>
-  </details>
+  
 </main>
 
 <footer class="topbar">
