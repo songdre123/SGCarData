@@ -17,10 +17,13 @@ MONTHS = {m: i + 1 for i, m in enumerate("Jan Feb Mar Apr May Jun Jul Aug Sep Oc
 MAKE_ALIASES = {"B.M.W.": "BMW", "M.G.": "MG"}      # keep identical to the registration scripts
 FUEL = {"P": "Petrol", "H": "Petrol-Electric", "R": "Petrol-Electric (Plug-in)", "E": "Electric",
         "B": "Petrol-CNG", "C": "CNG", "Y": "Diesel-Electric", "Q": "Diesel-Electric (Plug-in)"}
-MONEY = re.compile(r"^(-?[\d,]+|-)$")
+MONEY = re.compile(r"^(-?[\d,]+|-|\(\d[\d,]*\))$")      # LTA writes some negatives as (986)
+ROUND_TOL, HARD_LIMIT = 3, 50                              # dollars: rounding noise / LTA publication glitch / treated as a parse error
 
 def money(tok):
-    return None if tok == "-" else int(tok.replace(",", ""))
+    if tok == "-": return None
+    if tok.startswith("("): return -int(tok[1:-1].replace(",", ""))
+    return int(tok.replace(",", ""))
 
 full = subprocess.run(["pdftotext", "-layout", str(SRC), "-"], capture_output=True, text=True, check=True).stdout
 m = re.search(r"Registered in ([A-Z][a-z]{2}) (\d{4})", full)
@@ -29,7 +32,7 @@ if not m:
 month = f"{m.group(2)}-{MONTHS[m.group(1)]:02d}"
 
 candidates = sum(1 for l in full.splitlines() if re.match(r"^\s*\d{1,4}\s{2,}[A-Z]", l))   # lines that look like model rows
-rows, problems = [], []
+rows, problems, warnings = [], [], []
 for raw in full.splitlines():
     parts = re.split(r"\s{2,}", raw.strip())          # SN | Make | Model | the rest, single-spaced numbers
     if len(parts) < 4 or not parts[0].isdigit():
@@ -62,11 +65,15 @@ for raw in full.splitlines():
            "omv": omv, "gst_excise": gst, "arf": arf, "ves": ves, "eeai": eeai, "regn_fee": regn, "coe": coe,
            "basic_ex_coe": basic_ex, "basic_with_coe": basic_with,
            "price_ex_coe": price_ex, "price_with_coe": price_with, "diff_ex_coe": diff_ex, "diff_with_coe": diff_with}
-    # arithmetic checks using the PDF's own columns
-    if omv + gst + arf + ves + eeai + regn != basic_ex: problems.append((sn, "basic_ex_coe"))
-    if basic_ex + coe != basic_with: problems.append((sn, "basic_with_coe"))
-    if price_with is not None and price_with - basic_with != diff_with: problems.append((sn, "diff_with_coe"))
-    if price_ex is not None and price_ex - basic_ex != diff_ex: problems.append((sn, "diff_ex_coe"))
+    # arithmetic checks using the PDF's own columns. Up to ROUND_TOL dollars is rounding in LTA's figures and is ignored.
+    # Up to HARD_LIMIT is a discrepancy inside LTA's published file (stored as published, but warned about).
+    # Anything bigger means the columns were probably read wrongly, so the file is rejected.
+    for name, dev in (("basic_ex_coe", basic_ex - (omv + gst + arf + ves + eeai + regn)),
+                      ("basic_with_coe", basic_with - (basic_ex + coe)),
+                      ("diff_with_coe", None if price_with is None else diff_with - (price_with - basic_with)),
+                      ("diff_ex_coe", None if price_ex is None else diff_ex - (price_ex - basic_ex))):
+        if dev is None or abs(dev) <= ROUND_TOL: continue
+        (problems if abs(dev) > HARD_LIMIT else warnings).append((sn, name, dev))
     rows.append(row)
 
 sns = [r["sn"] for r in rows]
@@ -74,6 +81,8 @@ expected = max(sns) if sns else 0
 missing = sorted(set(range(1, expected + 1)) - set(sns))
 print(f"month {month}: parsed {len(rows)} models (highest SN {expected}); missing SNs: {missing or 'none'}")
 print("arithmetic problems:", problems or "none")
+if warnings:
+    print(f"WARNING: {len(warnings)} figure(s) in LTA's own PDF do not add up exactly (off by ${min(abs(w[2]) for w in warnings)} to ${max(abs(w[2]) for w in warnings)}); stored as published. SNs: {sorted({w[0] for w in warnings})}")
 print("models with a quoted dealer price:", sum(1 for r in rows if r["price_with_coe"] is not None))
 print(f"lines that look like model rows: {candidates}")
 if not rows or missing or problems or len(rows) != expected or len(rows) != candidates:

@@ -41,6 +41,12 @@ export default defineType({
       type: 'text',
       rows: 3,
     }),
+
+    defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+    }),
     defineField({
       name: 'body',
       title: 'Body',
