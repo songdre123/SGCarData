@@ -27,7 +27,8 @@ for i, r in enumerate(rows, 2):
         q = parse_num(r, "Quota", i)
         p = parse_num(r, "Quota Premium", i)
         b = parse_num(r, "Total Bids Received", i)
-        s = parse_num(r, "Number of Successful Bids")        ex = r["Bidding Exercise"].strip(); m = re.match(r"(\w+) (\d{4}) (First|Second)", ex)
+        s = parse_num(r, "Number of Successful Bids", i)
+        ex = r["Bidding Exercise"].strip(); m = re.match(r"(\w+) (\d{4}) (First|Second)", ex)
         month = datetime.strptime(f"{m.group(1)} {m.group(2)}", "%B %Y").strftime("%Y-%m")
     except Exception as e:
         errors.append(f"line {i}: cannot read this row ({type(e).__name__}): {list(r.values())[:4]}"); continue
