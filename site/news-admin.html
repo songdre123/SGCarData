@@ -4,15 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>News Admin — SG Car Data</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 <header class="topbar">
+  <button class="hamburger" aria-label="Menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
   <div class="brand">
     <h1>News Admin</h1>
     <p class="sub">Manage industry news items</p>
   </div>
-  <nav class="header-nav"><a class="nav-link" href="index.html">Registrations Tracker</a><a class="nav-link" href="cost.html">Cost Tracker</a><a class="nav-link" href="explorer.html?t=pop">Population</a><a class="nav-link" href="explorer.html?t=trf">Transfers</a><a class="nav-link" href="coe.html">COE</a><a class="nav-link" href="blog.html">Blog</a></nav>
+  <nav class="header-nav">
+    <button class="menu-close" aria-label="Close" onclick="document.body.classList.remove('menu-open')">✕</button><a class="nav-link" href="index.html">Registrations Tracker</a><a class="nav-link" href="cost.html">Cost Tracker</a><a class="nav-link" href="explorer.html?t=pop">Population</a><a class="nav-link" href="explorer.html?t=trf">Transfers</a><a class="nav-link" href="coe.html">COE</a><a class="nav-link" href="blog.html">Blog</a></nav>
   <div class="header-actions">
     <a class="btn ghost" href="index.html">Back to Dashboard</a>
   </div>
@@ -33,5 +35,51 @@
 </main>
 
 <script src="news-admin.js"></script>
+<script>
+// hamburger responsive fix
+(function(){
+  function updateHamburger() {
+    var hb = document.querySelector('.hamburger');
+    var nav = document.querySelector('.header-nav');
+    if (!hb || !nav) return;
+    if (window.innerWidth > 900) {
+      hb.style.display = 'none';
+      nav.style.display = 'flex';
+      document.body.classList.remove('menu-open');
+    } else {
+      hb.style.display = 'inline-block';
+      if (!document.body.classList.contains('menu-open')) {
+        nav.style.display = 'none';
+      }
+    }
+  }
+  window.addEventListener('resize', updateHamburger);
+  updateHamburger();
+  // fix onclick
+  var hb = document.querySelector('.hamburger');
+  if (hb) {
+    hb.onclick = function() {
+      document.body.classList.toggle('menu-open');
+      var nav = document.querySelector('.header-nav');
+      if (nav) {
+        if (document.body.classList.contains('menu-open')) {
+          nav.style.display = 'flex';
+        } else {
+          nav.style.display = 'none';
+        }
+      }
+    };
+  }
+  var mc = document.querySelector('.menu-close');
+  if (mc) {
+    mc.onclick = function() {
+      document.body.classList.remove('menu-open');
+      var nav = document.querySelector('.header-nav');
+      if (nav) nav.style.display = 'none';
+    };
+  }
+})();
+</script>
+<!-- hamburger-fix -->
 </body>
 </html>

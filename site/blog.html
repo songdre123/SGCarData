@@ -1,108 +1,183 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="SG Car Data Blog - Industry news and analysis on Singapore car market, registrations, COE and costs."
-    />
-    <meta
-      name="keywords"
-      content="Singapore car news, SG car market, COE news, LTA updates"
-    />
-    <meta property="og:title" content="SG Car Data Blog" />
-    <meta
-      property="og:description"
-      content="Industry news and analysis on Singapore car market."
-    />
-    <meta name="twitter:card" content="summary" />
-    <meta property="og:type" content="article" />
-
-    <title>SG Car Data — Blog</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="brand">
-        <h1>SG Car Data Blog</h1>
-        <p class="sub">Industry news &amp; analysis</p>
-      </div>
-      <nav class="header-nav">
-        <a class="nav-link" href="index.html">Registrations Tracker</a>
-        <a class="nav-link" href="cost.html">Cost Tracker</a>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="SG Car Data Blog - Industry news and analysis on Singapore car market, registrations, COE and costs.">
+<meta name="keywords" content="Singapore car news, SG car market, COE news, LTA updates">
+<meta property="og:title" content="SG Car Data Blog">
+<meta property="og:description" content="Industry news and analysis on Singapore car market.">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://sgcardata.com/blog.html">
+<title>SG Car Data — Blog</title>
+<link rel="stylesheet" href="styles.css?v=2">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "SG Car Data Blog",
+  "description": "Industry news and analysis on Singapore car market.",
+  "url": "https://sgcardata.com/blog.html"
+}
+</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="hamburger" aria-label="Menu" onclick="document.body.classList.toggle('menu-open')">☰</button>
+  <div class="brand">
+    <h1>SG Car Data Blog</h1>
+    <p class="sub">Industry news &amp; analysis</p>
+  </div>
+  <nav class="header-nav">
+    <button class="menu-close" aria-label="Close" onclick="document.body.classList.remove('menu-open')">✕</button>
+    <a class="nav-link" href="index.html">Registrations Tracker</a>
+    <a class="nav-link" href="cost.html">Cost Tracker</a>
     <a class="nav-link" href="explorer.html?t=pop">Population</a>
     <a class="nav-link" href="explorer.html?t=trf">Transfers</a>
     <a class="nav-link" href="coe.html">COE</a>
-        <a class="nav-link active" href="blog.html">Blog</a>
-      </nav>
-    <div class="header-actions"></div>
-    </header>
+    <a class="nav-link active" href="blog.html">Blog</a>
+  </nav>
+  <div class="header-actions"></div>
+</header>
 
-    <main>
+<main>
+  <div class="blog-layout">
+    <aside class="blog-sidebar">
+      <h3>Categories</h3>
+      <ul id="categories"></ul>
+    </aside>
+    <section class="blog-main">
       <details class="panel" open>
         <summary class="panel-head">
           <h2>Latest Posts</h2>
         </summary>
-        <div id="posts" class="news-list"></div>
+        <div id="posts" class="blog-grid"></div>
       </details>
-    </main>
+    </section>
+  </div>
+</main>
 
-    <script>
-      const postsEl = document.getElementById("posts");
-      const projectId = "pe0wkv78";
-      const dataset = "production";
-      const query = encodeURIComponent(
-        '*[_type=="post" && defined(publishedAt)] | order(publishedAt desc){_id, title, slug, publishedAt, excerpt, "img": coverImage.asset->url}'
-      );
-      const url = `https://${projectId}.apicdn.sanity.io/v2021-10-21/data/query/${dataset}?query=${encodeURIComponent(query)}`;
-      async function load() {
-        try {
-          postsEl.innerHTML = '<p class="table-note">Loading...</p>';
-          const res = await fetch(url);
-          const data = await res.json();
-          if (!data.result || !data.result.length) {
-            postsEl.innerHTML = '<p class="table-note">No posts yet.</p>';
-            return;
-          }
-          postsEl.innerHTML = data.result
-            .map(
-              (p) =>
-                '<article class="panel"><div class="panel-head"><h3>' +
-                escapeHtml(p.title || "") +
-                '</h3></div>' + (p.img ? '<img class="cover" src="' + p.img + '?w=900&h=500&fit=crop" alt="">' : '') + '<p class="table-note">' +
-                (p.publishedAt
-                  ? new Date(p.publishedAt).toLocaleDateString()
-                  : "") +
-                "</p><p>" +
-                escapeHtml(p.excerpt || "") +
-                "</p>" +
-                (p.slug
-                  ? '<a class="btn" href="post.html?slug=' +
-                    encodeURIComponent(p.slug.current) +
-                    '">Read more</a>'
-                  : "") +
-                "</article>"
-            )
-            .join("");
-        } catch (e) {
-          postsEl.innerHTML = '<p class="table-note">Error loading posts.</p>';
+<script>
+  const postsEl = document.getElementById("posts");
+  const catsEl = document.getElementById("categories");
+  const projectId = "pe0wkv78";
+  const dataset = "production";
+  let all = [];
+  let current = "all";
+
+  function renderCats() {
+    const cats = ["all", ...new Set(all.map((p) => p.category).filter(Boolean))];
+    catsEl.innerHTML = cats
+      .map((c) => '<li data-c="' + c + '" class="' + (current === c ? "active" : "") + '">' + (c === "all" ? "All" : escapeHtml(c)) + "</li>")
+      .join("");
+    catsEl.querySelectorAll("li").forEach((li) => {
+      li.addEventListener("click", () => {
+        current = li.dataset.c;
+        renderCats();
+        renderPosts();
+      });
+    });
+  }
+
+  function renderPosts() {
+    let list = all;
+    if (current !== "all") list = list.filter((p) => p.category === current);
+    if (!list.length) {
+      postsEl.innerHTML = '<p class="table-note">No posts.</p>';
+      return;
+    }
+    postsEl.innerHTML = list
+      .map((p) => {
+        const slug = p.slug && p.slug.current ? p.slug.current : "";
+        const img = p.img || (p.coverImage && p.coverImage.asset && p.coverImage.asset.url) || "";
+        return (
+          '<article class="blog-card">' +
+          "<h3>" +
+          escapeHtml(p.title || "") +
+          "</h3>" +
+          (img ? '<img class="cover" src="' + escapeHtml(img) + '?w=400&h=220&fit=crop" alt="">' : "") +
+          '<div class="meta">' +
+          (p.publishedAt ? new Date(p.publishedAt).toLocaleDateString() : "") +
+          (p.category ? " · " + escapeHtml(p.category) : "") +
+          "</div>" +
+          "<p>" +
+          escapeHtml(p.excerpt || "") +
+          "</p>" +
+          (slug ? '<a class="btn" href="post.html?slug=' + encodeURIComponent(slug) + '">Read more</a>' : "") +
+          "</article>"
+        );
+      })
+      .join("");
+  }
+
+  async function load() {
+    try {
+      postsEl.innerHTML = '<p class="table-note">Loading...</p>';
+      const query = encodeURIComponent('*[_type=="post" && defined(publishedAt)] | order(publishedAt desc){_id, title, slug, publishedAt, excerpt, "category": category->title, "img": coverImage.asset->url}');
+      const url = "https://" + projectId + ".api.sanity.io/v2021-10-21/data/query/" + dataset + "?query=" + query;
+      const res = await fetch(url);
+      const data = await res.json();
+      all = data.result || [];
+      renderCats();
+      renderPosts();
+    } catch (e) {
+      console.error(e);
+      postsEl.innerHTML = '<p class="table-note">Error loading posts.</p>';
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]));
+  }
+
+  load();
+</script>
+<script>
+// hamburger responsive fix
+(function(){
+  function updateHamburger() {
+    var hb = document.querySelector('.hamburger');
+    var nav = document.querySelector('.header-nav');
+    if (!hb || !nav) return;
+    if (window.innerWidth > 900) {
+      hb.style.display = 'none';
+      nav.style.display = 'flex';
+      document.body.classList.remove('menu-open');
+    } else {
+      hb.style.display = 'inline-block';
+      if (!document.body.classList.contains('menu-open')) {
+        nav.style.display = 'none';
+      }
+    }
+  }
+  window.addEventListener('resize', updateHamburger);
+  updateHamburger();
+  // fix onclick
+  var hb = document.querySelector('.hamburger');
+  if (hb) {
+    hb.onclick = function() {
+      document.body.classList.toggle('menu-open');
+      var nav = document.querySelector('.header-nav');
+      if (nav) {
+        if (document.body.classList.contains('menu-open')) {
+          nav.style.display = 'flex';
+        } else {
+          nav.style.display = 'none';
         }
       }
-      function escapeHtml(s) {
-        return (s || "").replace(
-          /[&<>"']/g,
-          (c) =>
-            ({
-              "&": "&amp;",
-              "<": "&lt;",
-              ">": "&gt;",
-              '"': "&quot;",
-              "'": "&#039;",
-            })[c]
-        );
-      }
-      load();
-    </script>
-  </body>
+    };
+  }
+  var mc = document.querySelector('.menu-close');
+  if (mc) {
+    mc.onclick = function() {
+      document.body.classList.remove('menu-open');
+      var nav = document.querySelector('.header-nav');
+      if (nav) nav.style.display = 'none';
+    };
+  }
+})();
+</script>
+<!-- hamburger-fix -->
+</body>
 </html>
