@@ -20,23 +20,31 @@ async function load() {
   initFilters();
   render();
 }
+function getCurrentYear() {
+  const now = new Date();
+  return now.getFullYear().toString();
+}
 
 function initScope() {
   const years = [...new Set(MONTHS.map((m) => m.slice(0, 4)))].sort();
   const y = $("scopeYear");
   y.innerHTML = '<option value="__all__">All years</option>';
   years.forEach((x) => y.add(new Option(x, x)));
+  y.value = years.includes(getCurrentYear()) ? getCurrentYear() : "__all__";
+  SCOPE.year = y.value;
 
   const m = $("scopeMonth");
   m.innerHTML = '<option value="__all__">All months (YTD)</option>';
 
   y.addEventListener("change", () => {
+    SCOPE.year = y.value;
     refreshMonthOptions();
+    $("ovYearFilter").hidden = y.value !== "__all__";
     render();
   });
+  $("ovYearFilter").hidden = y.value !== "__all__";
   refreshMonthOptions();
   $("scopeMonth").addEventListener("change", () => { SCOPE.month = $("scopeMonth").value; render(); });
-  $("scopeYear").addEventListener("change", () => { SCOPE.year = $("scopeYear").value; render(); });
   $("monthlyGroup").addEventListener("change", render);
 }
 
@@ -84,6 +92,8 @@ function initFilters() {
   if (ty) {
     const years = [...new Set(MONTHS.map((m)=>m.slice(0,4)))].sort();
     years.forEach(x=>ty.add(new Option(x,x)));
+    ty.value = years.includes(getCurrentYear()) ? getCurrentYear() : "__all__";
+    refreshTableMonthOptions();
     ty.addEventListener("change", ()=>{
       refreshTableMonthOptions();
       renderTable();
@@ -468,7 +478,7 @@ function renderOverview() {
   const tbody = document.querySelector("#overviewTable tbody");
   if (!tbody) return;
   let rows = scopeRows();
-  const ovy = $("ovYear") ? $("ovYear").value : $("scopeYear") ? $("scopeYear").value : "__all__";
+  const ovy = $("scopeYear").value === "__all__" && $("ovYear") ? $("ovYear").value : "__all__";
   if (ovy !== "__all__") rows = rows.filter(r=>r.m.slice(0,4)===ovy);
   const ovt = $("ovTier") ? $("ovTier").value : "__all__";
   const ovc = $("ovCountry") ? $("ovCountry").value : "__all__";

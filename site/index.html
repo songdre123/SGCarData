@@ -53,13 +53,6 @@
           <option value="__all__">All months (YTD)</option>
         </select>
       </label>
-      <label class="scope-grouping">Monthly chart grouping
-        <select id="monthlyGroup">
-          <option value="body">Body Type</option>
-          <option value="importer">AMD vs PI</option>
-          <option value="fuel">Fuel Type</option>
-        </select>
-      </label>
     </div>
   </details>
 
@@ -75,7 +68,9 @@
     <summary class="panel-head">
       <h2>Make Overview (YTD)</h2>
       <div class="filters">
-        <select id="ovYear"><option value="__all__">All years</option></select>
+        <label id="ovYearFilter" hidden>Year
+          <select id="ovYear"><option value="__all__">All years</option></select>
+        </label>
         <select id="ovTier"><option value="__all__">All tiers</option></select>
         <select id="ovCountry"><option value="__all__">All countries</option></select>
       </div>
@@ -92,14 +87,6 @@
 
   <details class="panel" open>
     <summary class="panel-head">
-      <h2>Monthly Registrations</h2>
-    </summary>
-    <div class="chart-wrap" ><canvas id="monthlyChart"></canvas></div>
-    <p class="table-note" id="monthlyNote"></p>
-  </details>
-
-  <details class="panel" open>
-    <summary class="panel-head">
       <h2>Fuel Mix &amp; Body Types</h2>
     </summary>
     <div class="split">
@@ -107,6 +94,25 @@
       <div class="chart-wrap"><canvas id="bodyChart"></canvas></div>
     </div>
   </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Monthly Registrations</h2>
+      <div class="filters">
+        <label>Group by
+          <select id="monthlyGroup">
+            <option value="body">Body Type</option>
+            <option value="importer">AMD vs PI</option>
+            <option value="fuel">Fuel Type</option>
+          </select>
+        </label>
+        <select id="monthlyMake"><option value="__all__">All makes</option></select>
+        <select id="monthlyImporter"><option value="__all__">AMD &amp; PI</option><option value="AMD">AMD (Official)</option><option value="PI">PI (Parallel)</option></select>
+        <select id="monthlyFuel"><option value="__all__">All fuels</option></select>
+        <select id="monthlyBody"><option value="__all__">All bodies</option><option value="SDN">Sedan</option><option value="SUV">SUV</option><option value="HB">Hatchback</option><option value="MPV">MPV</option><option value="STW">Station Wagon</option><option value="CPE">Coupe</option></select>
+      </div>
+    </summary>
+    <div class="chart-wrap" style="height: min(55vh, 420px);"><canvas id="monthlyChart"></canvas></div>
 
   <details class="panel" open>
     <summary class="panel-head">
@@ -176,7 +182,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="ui.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=4"></script>
 <script>
 // hamburger responsive fix
 (function(){
