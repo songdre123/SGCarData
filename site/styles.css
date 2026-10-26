@@ -134,6 +134,28 @@ th, td {
   white-space: nowrap;
 }
 th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--panel); }
+.sort-arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  opacity: .7;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.sort-arrow:hover,
+.sort-arrow[aria-pressed="true"] { color: var(--accent); opacity: 1; }
+.sort-arrow:hover { background: rgba(61, 219, 176, .08); }
+.sort-arrow:focus-visible { outline: 1px solid var(--accent); outline-offset: 1px; }
 tbody tr:hover { background: var(--panel-2); }
 .table-note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
 

@@ -75,12 +75,22 @@
         </label>
         <select id="ovTier"><option value="__all__">All tiers</option></select>
         <select id="ovCountry"><option value="__all__">All countries</option></select>
+        <select id="ovBody"><option value="__all__">All body types</option></select>
+        <select id="ovFuel"><option value="__all__">All propellants</option></select>
       </div>
     </summary>
     <div class="table-wrap">
       <table id="overviewTable">
         <thead><tr>
-          <th>Rank</th><th>Make</th><th>Units</th><th>% of total</th><th>% EV</th><th>% PI</th><th>EV units</th><th>PI units</th><th>Countries</th>
+          <th>Rank</th><th>Make</th>
+          <th>Units <button class="sort-arrow" type="button" data-overview-sort="u" data-sort-label="Units" aria-label="Sort by Units" aria-pressed="true">↓</button></th>
+          <th>AD Units <button class="sort-arrow" type="button" data-overview-sort="ad" data-sort-label="AD Units" aria-label="Sort by AD Units" aria-pressed="false">↕</button></th>
+          <th>% of total <button class="sort-arrow" type="button" data-overview-sort="pct" data-sort-label="% of total" aria-label="Sort by % of total" aria-pressed="false">↕</button></th>
+          <th>% EV <button class="sort-arrow" type="button" data-overview-sort="pctEv" data-sort-label="% EV" aria-label="Sort by % EV" aria-pressed="false">↕</button></th>
+          <th>% PI <button class="sort-arrow" type="button" data-overview-sort="pctPi" data-sort-label="% PI" aria-label="Sort by % PI" aria-pressed="false">↕</button></th>
+          <th>EV units <button class="sort-arrow" type="button" data-overview-sort="ev" data-sort-label="EV units" aria-label="Sort by EV units" aria-pressed="false">↕</button></th>
+          <th>PI units <button class="sort-arrow" type="button" data-overview-sort="pi" data-sort-label="PI units" aria-label="Sort by PI units" aria-pressed="false">↕</button></th>
+          <th>Country</th>
         </tr></thead>
         <tbody></tbody>
       </table>
@@ -184,7 +194,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="ui.js"></script>
-<script src="app.js?v=4"></script>
+<script src="app.js?v=8"></script>
 <script>
 // hamburger responsive fix
 (function(){

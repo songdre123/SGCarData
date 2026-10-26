@@ -6,6 +6,7 @@ let ALL = [];
 let MONTHS = [];
 let LATEST = "";
 let SCOPE = { year: "__all__", month: "__all__" };
+let OVERVIEW_SORT = { key: "u", direction: "desc" };
 let monthlyChart = null;
 let fuelChart = null;
 let bodyChart = null;
@@ -159,6 +160,34 @@ function initFilters() {
     const countries = [...new Set(ALL.map(r=>r.country).filter(Boolean))].sort();
     countries.forEach(x=>ovc2.add(new Option(x,x)));
     ovc2.addEventListener("change", renderOverview);
+  }
+  const ovBody = $("ovBody");
+  if (ovBody) {
+    const bodyNames = { CPE: "Coupe", HB: "Hatchback", MPV: "MPV", SDN: "Sedan", STW: "Station Wagon", SUV: "SUV" };
+    [...new Set(ALL.map(r=>r.body).filter(Boolean))].sort().forEach((body) => {
+      ovBody.add(new Option(bodyNames[body] || body, body));
+    });
+    ovBody.addEventListener("change", renderOverview);
+  }
+  const ovFuel = $("ovFuel");
+  if (ovFuel) {
+    [...new Set(ALL.map(r=>r.fuel).filter(Boolean))].sort().forEach((fuel) => {
+      ovFuel.add(new Option(fuel, fuel));
+    });
+    ovFuel.addEventListener("change", renderOverview);
+  }
+  const overviewTable = $("overviewTable");
+  if (overviewTable) {
+    overviewTable.tHead.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-overview-sort]");
+      if (!button) return;
+      const key = button.dataset.overviewSort;
+      OVERVIEW_SORT = {
+        key,
+        direction: OVERVIEW_SORT.key === key && OVERVIEW_SORT.direction === "desc" ? "asc" : "desc",
+      };
+      renderOverview();
+    });
   }
 }
 
@@ -482,20 +511,34 @@ function renderOverview() {
   if (ovy !== "__all__") rows = rows.filter(r=>r.m.slice(0,4)===ovy);
   const ovt = $("ovTier") ? $("ovTier").value : "__all__";
   const ovc = $("ovCountry") ? $("ovCountry").value : "__all__";
+  const ovBody = $("ovBody") ? $("ovBody").value : "__all__";
+  const ovFuel = $("ovFuel") ? $("ovFuel").value : "__all__";
   const totals = {};
   rows.forEach(r=>{
     if (ovt !== "__all__" && r.tier !== ovt) return;
     if (ovc !== "__all__" && r.country !== ovc) return;
-    totals[r.make] = totals[r.make] || {u:0,ev:0,pi:0,countries:new Set()};
+    if (ovBody !== "__all__" && r.body !== ovBody) return;
+    if (ovFuel !== "__all__" && r.fuel !== ovFuel) return;
+    totals[r.make] = totals[r.make] || {u:0,ad:0,ev:0,pi:0,countries:new Set()};
     totals[r.make].u += (r.u||0);
+    if (r.importer==="AMD") totals[r.make].ad += (r.u||0);
     if (r.fuel==="Electric") totals[r.make].ev += (r.u||0);
     if (r.importer==="PI") totals[r.make].pi += (r.u||0);
     if (r.country) totals[r.make].countries.add(r.country);
   });
   const grand = Object.values(totals).reduce((s,x)=>s+x.u,0);
-  const list = Object.entries(totals).map(([k,v])=>({make:k,u:v.u,ev:v.ev,pi:v.pi,c:v.countries.size,pct:grand? (v.u/grand*100):0,pctEv:v.u? (v.ev/v.u*100):0,pctPi:v.u?(v.pi/v.u*100):0})).sort((a,b)=>b.u-a.u);
+  const list = Object.entries(totals).map(([k,v])=>({make:k,u:v.u,ad:v.ad,ev:v.ev,pi:v.pi,c:[...v.countries].sort().join(", "),pct:grand? (v.u/grand*100):0,pctEv:v.u? (v.ev/v.u*100):0,pctPi:v.u?(v.pi/v.u*100):0}));
+  const direction = OVERVIEW_SORT.direction === "asc" ? 1 : -1;
+  list.sort((a, b) => direction * (a[OVERVIEW_SORT.key] - b[OVERVIEW_SORT.key]) || a.make.localeCompare(b.make));
+  $("overviewTable").querySelectorAll("[data-overview-sort]").forEach((button) => {
+    const key = button.dataset.overviewSort;
+    const active = key === OVERVIEW_SORT.key;
+    button.textContent = active ? (OVERVIEW_SORT.direction === "asc" ? "↑" : "↓") : "↕";
+    button.setAttribute("aria-label", `Sort ${active && OVERVIEW_SORT.direction === "desc" ? "ascending" : "descending"} by ${button.dataset.sortLabel}`);
+    button.setAttribute("aria-pressed", String(active));
+  });
   pagedTable(document.getElementById("overviewTable"), list, [
-    { get: (x, i) => i + 1 }, { get: x => x.make }, { get: x => x.u, num: 1, sum: 1 }, { get: x => x.pct, num: 1, sum: 1, dec: 1, suf: "%" },
+    { get: (x, i) => i + 1 }, { get: x => x.make }, { get: x => x.u, num: 1, sum: 1 }, { get: x => x.ad, num: 1, sum: 1 }, { get: x => x.pct, num: 1, sum: 1, dec: 1, suf: "%" },
     { get: x => x.pctEv, num: 1, dec: 1, suf: "%" }, { get: x => x.pctPi, num: 1, dec: 1, suf: "%" },
-    { get: x => x.ev, num: 1, sum: 1 }, { get: x => x.pi, num: 1, sum: 1 }, { get: x => x.c, num: 1 }], { reset: true });
+    { get: x => x.ev, num: 1, sum: 1 }, { get: x => x.pi, num: 1, sum: 1 }, { get: x => x.c }], { reset: true });
 }
