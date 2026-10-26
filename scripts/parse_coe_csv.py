@@ -10,9 +10,10 @@ from pathlib import Path
 def parse_num(r, key, line):
     value = r[key].strip()
     try:
-        return int(re.sub(r"[$,\s]", "", value))
+        return int(float(re.sub(r"[$,\s]", "", value)))
     except ValueError:
         raise ValueError(f"{key}={value!r}")
+    
 
 SRC = Path(sys.argv[1]); OUT = Path(__file__).resolve().parent.parent / "site" / "data" / "coe.json"
 WANT = ["Bidding Exercise", "Announcement Date", "Year", "Category", "Quota", "Quota Premium", "Total Bids Received", "Number of Successful Bids"]
