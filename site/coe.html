@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SG Car Data: COE prices and quotas</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="topbar"><div class="brand"><h1>SG Car Data Dashboard</h1><p class="sub">Singapore LTA car registrations, costs, population, transfers and COE</p></div>
+<nav class="header-nav"><a class="nav-link" href="index.html">Registrations Tracker</a><a class="nav-link" href="cost.html">Cost Tracker</a><a class="nav-link" href="explorer.html?t=pop">Population</a><a class="nav-link" href="explorer.html?t=trf">Transfers</a><a class="nav-link active" href="coe.html">COE</a><a class="nav-link" href="blog.html">Blog</a></nav></header>
+<main>
+<section class="panel"><div class="panel-head"><h2 id="latest">COE bidding results</h2></div><p class="table-note" id="note"></p><div id="cards" class="coe-cards"></div></section>
+<section class="panel"><div class="panel-head"><h2>Premium over time</h2>
+ <div class="filters" id="chips"></div>
+ <div class="filters"><select id="range"><option value="1">Last 1 year</option><option value="3" selected>Last 3 years</option><option value="5">Last 5 years</option><option value="10">Last 10 years</option><option value="0">Since 2002</option></select></div></div>
+ <div class="chart-wrap" style="height:min(55vh,420px)"><canvas id="c1"></canvas></div></section>
+<section class="panel"><div class="panel-head"><h2>Quota and bids</h2><div class="filters"><select id="cat2"></select></div></div>
+ <p class="table-note">Bids above the quota mean the category is oversubscribed. The gap between bids received and successful bids is the number of unsuccessful bidders.</p>
+ <div class="chart-wrap" style="height:min(50vh,380px)"><canvas id="c2"></canvas></div></section>
+<section class="panel"><div class="panel-head"><h2>All bidding exercises</h2><div class="filters"><select id="fcat"></select><select id="fyear"></select></div></div>
+ <div class="table-wrap"><table id="tbl"><thead><tr><th>Announced</th><th>Exercise</th><th>Category</th><th class="num">Quota</th><th class="num">Bids received</th><th class="num">Successful bids</th><th class="num">Bids per place</th><th class="num">Premium</th></tr></thead><tbody></tbody></table></div></section>
+</main>
+<footer class="topbar"><p>Source: Land Transport Authority (LTA), results of COE bidding exercises. Premium is the quota premium (the lowest successful bid).</p></footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script><script src="ui.js"></script><script src="coe.js"></script>
+</body></html>

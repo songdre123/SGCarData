@@ -31,6 +31,17 @@ def run():
             last = max(r["m"] for r in R); ny = ys[-1] + 1
             if last[:4] > str(ys[-1]) and str(ny) <= last[:4]: pass
             elif last[:4] > str(ys[-1] + 0): issues.append(f"population: registrations reach {last} but the latest population year is {ys[-1]}")
+    C = load("coe.json")
+    if C:
+        by = {}
+        for r in C: by.setdefault(r["c"], []).append(r)
+        for c, l in by.items():
+            l.sort(key=lambda r: r["d"])
+            if len(l) > 1 and abs(l[-1]["p"] / l[-2]["p"] - 1) > 0.4: issues.append(f"COE Cat {c}: premium moved {l[-1]['p'] / l[-2]['p'] - 1:+.0%} at the latest exercise ({l[-1]['d']}) - check the CSV")
+        ms = {}
+        for d in sorted({r["d"] for r in C})[-48:]: ms[d[:7]] = ms.get(d[:7], 0) + 1
+        for m, n in sorted(ms.items())[1:-1]:
+            if n != 2: issues.append(f"COE: {m} has {n} bidding exercise(s), expected 2")
     (D / "sanity.json").write_text(json.dumps({"issues": issues}), encoding="utf-8")
     print("SANITY CHECKS:", "all clear" if not issues else f"{len(issues)} thing(s) to look at")
     for i in issues: print("  -", i)

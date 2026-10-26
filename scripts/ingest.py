@@ -1,4 +1,4 @@
-"""Process every PDF in incoming/: detect its type by content, parse + validate it, then move it to archive/.
+"""Process every PDF and COE CSV in incoming/: detect its type by content, parse + validate it, then move it to archive/.
 Usage: python scripts/ingest.py        (exit code 1 if any PDF fails its checks; failed PDFs stay in incoming/)
 With no PDFs present it just rebuilds site/data/registrations.json (use after editing lookups.json).
 """
@@ -11,16 +11,21 @@ ROOT = Path(__file__).resolve().parent.parent
 INCOMING, ARCHIVE = ROOT / "incoming", ROOT / "archive"
 ARCHIVE.mkdir(exist_ok=True)
 failed = 0
-for pdf in sorted(INCOMING.glob("*.pdf")):
-    head = subprocess.run(["pdftotext", "-l", "1", str(pdf), "-"], capture_output=True, text=True).stdout.upper()
-    if "NEW REGISTRATION OF CARS BY MAKE" in head:
+for pdf in sorted(list(INCOMING.glob("*.pdf")) + list(INCOMING.glob("*.csv"))):
+    if pdf.suffix.lower() == ".csv":
+        head = pdf.read_text(encoding="utf-8-sig", errors="ignore")[:400].upper()
+    else:
+        head = subprocess.run(["pdftotext", "-l", "1", str(pdf), "-"], capture_output=True, text=True).stdout.upper()
+    if "QUOTA PREMIUM" in head and "BIDDING EXERCISE" in head:
+        script = "parse_coe_csv.py"
+    elif "NEW REGISTRATION OF CARS BY MAKE" in head:
         script = "parse_regn_pdf.py"
     elif "COST (S$) FOR CARS REGISTERED" in head:
         script = "parse_cost_pdf.py"
     elif "TOTAL CAR POPULATION BY MAKE" in head or "EFFECTIVE TRANSFER OF CAR OWNERSHIP BY MAKE" in head:
         script = "parse_stats_pdf.py"
     else:
-        print(f"SKIPPED {pdf.name}: not a recognised LTA PDF"); failed += 1; continue
+        print(f"SKIPPED {pdf.name}: not a recognised LTA file"); failed += 1; continue
     print(f"--- {pdf.name} -> {script}")
     if subprocess.run([sys.executable, str(ROOT / "scripts" / script), str(pdf)]).returncode == 0:
         shutil.move(str(pdf), ARCHIVE / pdf.name)

@@ -41,11 +41,11 @@ export default defineType({
       type: 'text',
       rows: 3,
     }),
-
     defineField({
       name: 'category',
       title: 'Category',
       type: 'string',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'body',
