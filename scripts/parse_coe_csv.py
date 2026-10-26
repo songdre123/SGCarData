@@ -7,6 +7,13 @@ import csv, json, re, sys
 from datetime import datetime
 from pathlib import Path
 
+def parse_num(r, key, line):
+    value = r[key].strip()
+    try:
+        return int(re.sub(r"[$,\s]", "", value))
+    except ValueError:
+        raise ValueError(f"{key}={value!r}")
+
 SRC = Path(sys.argv[1]); OUT = Path(__file__).resolve().parent.parent / "site" / "data" / "coe.json"
 WANT = ["Bidding Exercise", "Announcement Date", "Year", "Category", "Quota", "Quota Premium", "Total Bids Received", "Number of Successful Bids"]
 num = lambda v: int(re.sub(r"[$,\s]", "", v))
@@ -17,8 +24,10 @@ for i, r in enumerate(rows, 2):
     try:
         d = datetime.strptime(r["Announcement Date"].strip(), "%d/%m/%Y").date().isoformat()
         c = re.match(r"Cat ([A-E])\b", r["Category"].strip()).group(1)
-        q, p, b, s = (num(r[k]) for k in ("Quota", "Quota Premium", "Total Bids Received", "Number of Successful Bids"))
-        ex = r["Bidding Exercise"].strip(); m = re.match(r"(\w+) (\d{4}) (First|Second)", ex)
+        q = parse_num(r, "Quota", i)
+        p = parse_num(r, "Quota Premium", i)
+        b = parse_num(r, "Total Bids Received", i)
+        s = parse_num(r, "Number of Successful Bids")        ex = r["Bidding Exercise"].strip(); m = re.match(r"(\w+) (\d{4}) (First|Second)", ex)
         month = datetime.strptime(f"{m.group(1)} {m.group(2)}", "%B %Y").strftime("%Y-%m")
     except Exception as e:
         errors.append(f"line {i}: cannot read this row ({type(e).__name__}): {list(r.values())[:4]}"); continue
