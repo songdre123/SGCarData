@@ -26,6 +26,83 @@ function getCurrentYear() {
   return now.getFullYear().toString();
 }
 
+function selectedFilterValues(id) {
+  const select = $(id);
+  return select
+    ? new Set([...select.selectedOptions].map((option) => option.value).filter(Boolean))
+    : new Set();
+}
+
+function resetMultiFilter(id) {
+  const select = $(id);
+  if (!select) return;
+  [...select.options].forEach((option) => {
+    option.selected = option.value === "";
+  });
+}
+
+function addMultiFilterListener(id, onChange) {
+  const select = $(id);
+  if (!select) return;
+  select.addEventListener("change", () => {
+    const hasSelection = [...select.selectedOptions].some((option) => option.value);
+    const placeholder = [...select.options].find((option) => option.value === "");
+    if (placeholder) placeholder.selected = !hasSelection;
+    onChange();
+  });
+}
+
+function initPanelToggles() {
+  const animations = new WeakMap();
+  document.querySelectorAll("details.panel").forEach((panel, index) => {
+    const summary = panel.querySelector(":scope > summary");
+    const content = panel.querySelector(":scope > .panel-content");
+    const button = summary?.querySelector(".panel-toggle");
+    if (!summary || !content || !button) return;
+
+    content.id = `panel-content-${index + 1}`;
+    button.setAttribute("aria-controls", content.id);
+    button.setAttribute("aria-expanded", String(panel.open));
+    const panelName = button.getAttribute("aria-label").replace(/^(Collapse|Expand)\s+/, "");
+    button.setAttribute("aria-label", `${panel.open ? "Collapse" : "Expand"} ${panelName}`);
+    summary.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (event.target.closest(".panel-toggle") !== button) return;
+
+      const opening = button.getAttribute("aria-expanded") !== "true";
+      const previous = animations.get(panel);
+      const computed = getComputedStyle(content);
+      const fromHeight = previous ? content.getBoundingClientRect().height : opening ? 0 : content.scrollHeight;
+      const fromOpacity = previous ? Number(computed.opacity) : opening ? 0 : 1;
+      previous?.cancel();
+      animations.delete(panel);
+
+      panel.open = true;
+      button.setAttribute("aria-expanded", String(opening));
+      button.setAttribute("aria-label", `${opening ? "Collapse" : "Expand"} ${panelName}`);
+      content.style.overflow = "hidden";
+      const toHeight = opening ? content.scrollHeight : 0;
+      const animation = content.animate(
+        [
+          { height: `${fromHeight}px`, opacity: fromOpacity },
+          { height: `${toHeight}px`, opacity: opening ? 1 : 0 },
+        ],
+        {
+          duration: matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 220,
+          easing: "ease",
+        },
+      );
+      animations.set(panel, animation);
+      animation.onfinish = () => {
+        if (animations.get(panel) !== animation) return;
+        animations.delete(panel);
+        if (!opening) panel.open = false;
+        content.style.removeProperty("overflow");
+      };
+    });
+  });
+}
+
 function initScope() {
   const years = [...new Set(MONTHS.map((m) => m.slice(0, 4)))].sort();
   const y = $("scopeYear");
@@ -106,19 +183,28 @@ function initFilters() {
   if (tmk) {
     const makes = [...new Set(ALL.map((r) => r.make))].sort();
     makes.forEach((x) => tmk.add(new Option(x, x)));
-    tmk.addEventListener("change", renderTable);
   }
+  addMultiFilterListener("tableMake", renderTable);
   // Table importer
   if ($("tableImporter")) $("tableImporter").addEventListener("change", renderTable);
+  const tableTier = $("tableTier");
+  if (tableTier) {
+    const tiers = [...new Set(ALL.map((r) => r.tier).filter(Boolean))].sort();
+    tiers.forEach((tier) => {
+      tableTier.add(new Option(tier, tier));
+    });
+    if (ALL.some((r) => !r.tier)) tableTier.add(new Option("Other", "__other__"));
+    tableTier.addEventListener("change", renderTable);
+  }
   // Table body
-  if ($("tableBody")) $("tableBody").addEventListener("change", renderTable);
+  addMultiFilterListener("tableBody", renderTable);
   // Table fuel
   const tf = $("tableFuel");
   if (tf) {
     const fuels = [...new Set(ALL.map((r) => r.fuel))].sort();
     fuels.forEach((x) => tf.add(new Option(x, x)));
-    tf.addEventListener("change", renderTable);
   }
+  addMultiFilterListener("tableFuel", renderTable);
   // Table search
   if ($("tableSearch")) $("tableSearch").addEventListener("input", renderTable);
   // Reset
@@ -126,10 +212,11 @@ function initFilters() {
     if ($("tableSearch")) $("tableSearch").value = "";
     if ($("tableYear")) $("tableYear").value = "__all__";
     if ($("tableMonth")) $("tableMonth").value = "__all__";
-    if ($("tableMake")) $("tableMake").value = "__all__";
+    resetMultiFilter("tableMake");
     if ($("tableImporter")) $("tableImporter").value = "__all__";
-    if ($("tableBody")) $("tableBody").value = "__all__";
-    if ($("tableFuel")) $("tableFuel").value = "__all__";
+    if ($("tableTier")) $("tableTier").value = "__all__";
+    resetMultiFilter("tableBody");
+    resetMultiFilter("tableFuel");
     renderTable();
   });
   // Top make month
@@ -143,6 +230,13 @@ function initFilters() {
   if ($("lastUpdate")) $("lastUpdate").textContent = "Updated " + LATEST;
 
   // overview filters
+  const ovMake = $("ovMake");
+  if (ovMake) {
+    [...new Set(ALL.map(r=>r.make).filter(Boolean))].sort().forEach((make) => {
+      ovMake.add(new Option(make, make));
+    });
+  }
+  addMultiFilterListener("ovMake", renderOverview);
   const ovy2 = $("ovYear");
   if (ovy2) {
     const years = [...new Set(MONTHS.map(m=>m.slice(0,4)))].sort();
@@ -153,6 +247,7 @@ function initFilters() {
   if (ovt2) {
     const tiers = [...new Set(ALL.map(r=>r.tier).filter(Boolean))].sort();
     tiers.forEach(x=>ovt2.add(new Option(x,x)));
+    if (ALL.some((r) => !r.tier)) ovt2.add(new Option("Other", "__other__"));
     ovt2.addEventListener("change", renderOverview);
   }
   const ovc2 = $("ovCountry");
@@ -167,15 +262,15 @@ function initFilters() {
     [...new Set(ALL.map(r=>r.body).filter(Boolean))].sort().forEach((body) => {
       ovBody.add(new Option(bodyNames[body] || body, body));
     });
-    ovBody.addEventListener("change", renderOverview);
   }
+  addMultiFilterListener("ovBody", renderOverview);
   const ovFuel = $("ovFuel");
   if (ovFuel) {
     [...new Set(ALL.map(r=>r.fuel).filter(Boolean))].sort().forEach((fuel) => {
       ovFuel.add(new Option(fuel, fuel));
     });
-    ovFuel.addEventListener("change", renderOverview);
   }
+  addMultiFilterListener("ovFuel", renderOverview);
   const overviewTable = $("overviewTable");
   if (overviewTable) {
     overviewTable.tHead.addEventListener("click", (event) => {
@@ -471,19 +566,21 @@ function renderTable() {
   let rows = scopeRows();
   const q = $("tableSearch") ? $("tableSearch").value.trim().toLowerCase() : "";
   const tm = $("tableMonth") ? $("tableMonth").value : "__all__";
-  const tmk = $("tableMake") ? $("tableMake").value : "__all__";
+  const tmk = selectedFilterValues("tableMake");
   const tim = $("tableImporter") ? $("tableImporter").value : "__all__";
-  const tbd = $("tableBody") ? $("tableBody").value : "__all__";
-  const tf = $("tableFuel") ? $("tableFuel").value : "__all__";
+  const ttier = $("tableTier") ? $("tableTier").value : "__all__";
+  const tbd = selectedFilterValues("tableBody");
+  const tf = selectedFilterValues("tableFuel");
 
   const ty = $("tableYear") ? $("tableYear").value : "__all__";
   rows = rows.filter((r) => {
     if (ty !== "__all__" && r.m.slice(0,4) !== ty) return false;
     if (tm !== "__all__" && r.m !== tm) return false;
-    if (tmk !== "__all__" && r.make !== tmk) return false;
+    if (tmk.size && !tmk.has(r.make)) return false;
     if (tim !== "__all__" && r.importer !== tim) return false;
-    if (tbd !== "__all__" && r.body !== tbd) return false;
-    if (tf !== "__all__" && r.fuel !== tf) return false;
+    if (ttier === "__other__" ? Boolean(r.tier) : ttier !== "__all__" && r.tier !== ttier) return false;
+    if (tbd.size && !tbd.has(r.body)) return false;
+    if (tf.size && !tf.has(r.fuel)) return false;
     if (q && !(r.m + " " + r.make + " " + r.importer + " " + r.fuel + " " + r.body).toLowerCase().includes(q)) return false;
     return true;
   });
@@ -495,6 +592,7 @@ function renderTable() {
   if (note) note.textContent = `${fmt(rows.length)} rows match your filters`;
 }
 
+initPanelToggles();
 load();
 
 function pctOfTotal(total, v) {
@@ -511,14 +609,16 @@ function renderOverview() {
   if (ovy !== "__all__") rows = rows.filter(r=>r.m.slice(0,4)===ovy);
   const ovt = $("ovTier") ? $("ovTier").value : "__all__";
   const ovc = $("ovCountry") ? $("ovCountry").value : "__all__";
-  const ovBody = $("ovBody") ? $("ovBody").value : "__all__";
-  const ovFuel = $("ovFuel") ? $("ovFuel").value : "__all__";
+  const ovMake = selectedFilterValues("ovMake");
+  const ovBody = selectedFilterValues("ovBody");
+  const ovFuel = selectedFilterValues("ovFuel");
   const totals = {};
   rows.forEach(r=>{
-    if (ovt !== "__all__" && r.tier !== ovt) return;
+    if (ovt === "__other__" ? Boolean(r.tier) : ovt !== "__all__" && r.tier !== ovt) return;
     if (ovc !== "__all__" && r.country !== ovc) return;
-    if (ovBody !== "__all__" && r.body !== ovBody) return;
-    if (ovFuel !== "__all__" && r.fuel !== ovFuel) return;
+    if (ovMake.size && !ovMake.has(r.make)) return;
+    if (ovBody.size && !ovBody.has(r.body)) return;
+    if (ovFuel.size && !ovFuel.has(r.fuel)) return;
     totals[r.make] = totals[r.make] || {u:0,ad:0,ev:0,pi:0,countries:new Set()};
     totals[r.make].u += (r.u||0);
     if (r.importer==="AMD") totals[r.make].ad += (r.u||0);
