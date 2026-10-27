@@ -5,7 +5,7 @@ With no PDFs present it just rebuilds site/data/registrations.json (use after ed
 import shutil, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import store, cost_history, sanity
+import store, cost_history, popmodel, sanity
 
 ROOT = Path(__file__).resolve().parent.parent
 INCOMING, ARCHIVE = ROOT / "incoming", ROOT / "archive"
@@ -18,6 +18,8 @@ for pdf in sorted(list(INCOMING.glob("*.pdf")) + list(INCOMING.glob("*.csv"))):
         head = subprocess.run(["pdftotext", "-l", "1", str(pdf), "-"], capture_output=True, text=True).stdout.upper()
     if "QUOTA PREMIUM" in head and "BIDDING EXERCISE" in head:
         script = "parse_coe_csv.py"
+    elif "ANNUAL NEW REGISTRATION OF CARS" in head:
+        script = "parse_newreg_pdf.py"
     elif "NEW REGISTRATION OF CARS BY MAKE" in head:
         script = "parse_regn_pdf.py"
     elif "COST (S$) FOR CARS REGISTERED" in head:
@@ -34,5 +36,6 @@ for pdf in sorted(list(INCOMING.glob("*.pdf")) + list(INCOMING.glob("*.csv"))):
 if not failed and any(store.REGN.glob("20??-??.json")):
     store.rebuild()          # always rebuild, so edits to lookups.json also take effect
     cost_history.rebuild()   # ...and edits to cost_aliases.json
+    popmodel.rebuild()       # population history, implied deregistrations and the current estimate
     sanity.run()
 sys.exit(1 if failed else 0)

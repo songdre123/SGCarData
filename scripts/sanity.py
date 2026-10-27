@@ -42,6 +42,14 @@ def run():
         for d in sorted({r["d"] for r in C})[-48:]: ms[d[:7]] = ms.get(d[:7], 0) + 1
         for m, n in sorted(ms.items())[1:-1]:
             if n != 2: issues.append(f"COE: {m} has {n} bidding exercise(s), expected 2")
+    M = load("popmodel.json")
+    if M:
+        mt = M["meta"]; best = mt["methods"][mt["chosen"]]["mae_pct"]
+        if best > 2: issues.append(f"population model: backtest error is {best:.1f}% of population, so the estimate is less reliable than usual")
+        for mk, h in M["history"].items():
+            y = str(mt["pop_year"]); dv = h["dereg"].get(y, h["dereg"].get(int(y)))
+            if dv is not None and dv < -50 and h["pop"].get(y, h["pop"].get(int(y)), 0) >= 1000: issues.append(f"population model: {mk} shows {dv:,} implied deregistrations in {y} (more cars than registrations explain) - check the PDFs")
+        if mt.get("est_year") and mt["est_latest_month"] < max(r["m"] for r in R or [{"m": ""}]): issues.append("population model: estimate is older than the latest registrations - run an upload to refresh it")
     (D / "sanity.json").write_text(json.dumps({"issues": issues}), encoding="utf-8")
     print("SANITY CHECKS:", "all clear" if not issues else f"{len(issues)} thing(s) to look at")
     for i in issues: print("  -", i)

@@ -49,6 +49,17 @@ head = text[:600].upper()
 if "POPULATION" in head or "ANNUAL EFFECTIVE TRANSFER" in head:
     kind = "pop" if "POPULATION" in head else "trfyear"
     A = [t for t in tables if t[0]]; B = [t for t in tables if not t[0]]
+    def store_pop_make(rowsB):                 # make-only history (2015 onwards): less detail, but a longer record
+        pmf = DATA / "pop_make.json"
+        cur = {(r["y"], r["make"]): r["u"] for r in json.loads(pmf.read_text())} if pmf.exists() else {}
+        for mk, _, v in rowsB:
+            for y, u in v.items(): cur[(int(y), mk)] = u
+        pmf.write_text(json.dumps([{"y": y, "make": m, "u": u} for (y, m), u in sorted(cur.items())], separators=(",", ":")))
+    if not A and B:                            # an older PDF with only the make-only table: keep it as history
+        rowsB = [r for t in B for r in t[2]]; totB = next(t[3] for t in reversed(B) if t[3]); check_sums(rowsB, totB, "make-only table")
+        if kind != "pop": sys.exit("Only a make-only table found; nothing stored for this report type")
+        if errors: print("CHECK FAILED - nothing written:", *errors[:12], sep="\n  "); sys.exit(1)
+        store_pop_make(rowsB); print(f"pop (make-only history): years {sorted(totB)} | PDF totals {totB} | ALL CHECKS PASSED"); sys.exit(0)
     rowsA = [r for t in A for r in t[2]]; totA = next(t[3] for t in reversed(A) if t[3])
     check_sums(rowsA, totA, "make x fuel table")
     if B:
@@ -73,6 +84,7 @@ if "POPULATION" in head or "ANNUAL EFFECTIVE TRANSFER" in head:
     if errors: print("CHECK FAILED - nothing written:", *errors[:12], sep="\n  "); sys.exit(1)
     for y in totA:
         (out / f"{y}.json").write_text(json.dumps([{"make": mk, "fuel": f, "u": v[y]} for mk, f, v in rowsA if v.get(y)], separators=(",", ":")))
+    if kind == "pop" and B: store_pop_make(rowsB)
     files = sorted(out.glob("*.json")); allr = [{"y": p.stem, **r} for p in files for r in json.loads(p.read_text())]
     (DATA / ("population.json" if kind == "pop" else "transfers_annual.json")).write_text(json.dumps(allr, separators=(",", ":")))
     print(f"{kind}: stored years {[p.stem for p in files]} | PDF totals {totA} | ALL CHECKS PASSED")
