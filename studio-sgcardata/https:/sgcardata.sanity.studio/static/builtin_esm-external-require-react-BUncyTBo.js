@@ -1,0 +1,1 @@
+import{t as e}from"./rolldown-runtime-DN1TCW_I.js";import*as t from"react";var n=e(((e,n)=>{n.exports=Object.prototype.hasOwnProperty.call(t,`module.exports`)?t[`module.exports`]:{...t}}));export{n as t};
