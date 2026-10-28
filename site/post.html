@@ -9,7 +9,7 @@
 <meta property="og:type" content="article">
 
 <title>SG Car Data — Post</title>
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 <header class="topbar">
@@ -34,7 +34,7 @@
   <article class="panel">
     <div class="panel-head"><h2 id="title"></h2></div>
     <p class="table-note" id="meta"></p>
-    <div id="body"></div>
+    <div id="body" class="post-content"></div>
     <a class="btn ghost" href="blog.html">Back to blog</a>
   </article>
 </main>
@@ -45,29 +45,100 @@
   const body = document.getElementById('body');
   const projectId = 'pe0wkv78';
   const dataset = 'production';
-  const params = new URLSearchParams(location.search);
-  const slug = params.get('slug');
-  if (!slug) { body.textContent = 'No slug specified'; }
-  const query = encodeURIComponent('*[_type=="post" && slug.current=="'+slug+'"][0]{title,publishedAt,body[]{..., _type == "image" => {"asset": asset->{url}, alt, caption}}}');
-  const url = 'https://'+projectId+'.api.sanity.io/v2021-10-21/data/query/'+dataset+'?query='+query;
+  const slug = new URLSearchParams(location.search).get('slug');
+  const query = '*[_type == "post" && slug.current == $slug][0]{title,publishedAt,body[]{..., _type == "image" => {"asset": asset->{url}, alt, caption}}}';
+  const url = 'https://' + projectId + '.api.sanity.io/v2021-10-21/data/query/' + dataset +
+    '?query=' + encodeURIComponent(query) + '&$slug=' + encodeURIComponent(JSON.stringify(slug));
   async function load() {
     try {
       const res = await fetch(url);
+      if (!res.ok) throw new Error('Sanity request failed: ' + res.status);
       const data = await res.json();
       const p = data.result;
       if (!p) { body.textContent = 'Post not found'; return; }
       title.textContent = p.title || '';
       meta.textContent = p.publishedAt ? new Date(p.publishedAt).toLocaleDateString() : '';
       body.innerHTML = render(p.body||[]);
-    } catch(e) { body.textContent = 'Error loading post'; }
+    } catch(e) {
+      console.error(e);
+      body.textContent = 'Error loading post.';
+    }
   }
   function render(blocks) {
-    return (blocks||[]).map(b=>{
-      if (b._type==='block') return '<p>'+escapeHtml((b.children||[]).map(c=>c.text).join(''))+'</p>';
-      return '';
+    const output = [];
+    let activeList = null;
+    const closeList = () => {
+      if (activeList) output.push(activeList.close);
+      activeList = null;
+    };
+
+    (blocks || []).forEach((block) => {
+      if (block._type === 'block' && block.listItem) {
+        const listTag = block.listItem === 'number' ? 'ol' : 'ul';
+        const level = Math.max(1, Number(block.level) || 1);
+        if (!activeList || activeList.tag !== listTag || activeList.level !== level) {
+          closeList();
+          const indent = (level - 1) * 1.5;
+          output.push('<' + listTag + ' class="post-list" style="--list-indent:' + indent + 'rem">');
+          activeList = { tag: listTag, level, close: '</' + listTag + '>' };
+        }
+        output.push('<li>' + renderChildren(block) + '</li>');
+        return;
+      }
+
+      closeList();
+      if (block._type === 'image') {
+        const imageUrl = safeUrl(block.asset && block.asset.url);
+        if (!imageUrl) return;
+        const src = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 'auto=format&w=1200';
+        output.push(
+          '<figure class="post-image"><img src="' + escapeHtml(src) + '" alt="' +
+          escapeHtml(block.alt || block.caption || '') + '">' +
+          (block.caption ? '<figcaption>' + escapeHtml(block.caption) + '</figcaption>' : '') +
+          '</figure>'
+        );
+        return;
+      }
+      if (block._type !== 'block') return;
+
+      const style = block.style || 'normal';
+      const tag = ({ h1: 'h1', h2: 'h2', h3: 'h3', h4: 'h4', blockquote: 'blockquote' })[style] || 'p';
+      output.push('<' + tag + '>' + renderChildren(block) + '</' + tag + '>');
+    });
+    closeList();
+    return output.join('');
+  }
+  function renderChildren(block) {
+    const markDefs = new Map((block.markDefs || []).map((mark) => [mark._key, mark]));
+    return (block.children || []).map((child) => {
+      let text = escapeHtml(child.text || '');
+      for (const mark of [...(child.marks || [])].reverse()) {
+        if (mark === 'strong') text = '<strong>' + text + '</strong>';
+        else if (mark === 'em') text = '<em>' + text + '</em>';
+        else if (mark === 'code') text = '<code>' + text + '</code>';
+        else if (mark === 'underline') text = '<u>' + text + '</u>';
+        else if (mark === 'strike-through') text = '<s>' + text + '</s>';
+        else {
+          const definition = markDefs.get(mark);
+          const href = definition && safeUrl(definition.href, true);
+          if (href) {
+            const external = /^https?:\/\//i.test(href);
+            text = '<a href="' + escapeHtml(href) + '"' +
+              (external ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + text + '</a>';
+          }
+        }
+      }
+      return text;
     }).join('');
   }
-  function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[c])); }
+  function safeUrl(value, allowMailto = false) {
+    if (typeof value !== 'string') return '';
+    if (/^https?:\/\/[^\s]+$/i.test(value)) return value;
+    if (allowMailto && /^mailto:[^\s]+$/i.test(value)) return value;
+    if (allowMailto && value.startsWith('/') && !value.startsWith('//')) return value;
+    return '';
+  }
+  function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[c])); }
   if (slug) load();
 </script>
 <script>

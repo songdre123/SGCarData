@@ -286,6 +286,8 @@ function initFilters() {
     countries.forEach(x=>ovc2.add(new Option(x,x)));
     ovc2.addEventListener("change", renderOverview);
   }
+  const ovi = $("ovImporter");
+  if (ovi) ovi.addEventListener("change", renderOverview);
   const ovBody = $("ovBody");
   if (ovBody) {
     const bodyNames = { CPE: "Coupe", HB: "Hatchback", MPV: "MPV", SDN: "Sedan", STW: "Station Wagon", SUV: "SUV" };
@@ -684,6 +686,7 @@ function renderOverview() {
   if (ovy !== "__all__") rows = rows.filter(r=>r.m.slice(0,4)===ovy);
   const ovt = $("ovTier") ? $("ovTier").value : "__all__";
   const ovc = $("ovCountry") ? $("ovCountry").value : "__all__";
+  const ovi = $("ovImporter") ? $("ovImporter").value : "__all__";
   const ovMake = selectedFilterValues("ovMake");
   const ovBody = selectedFilterValues("ovBody");
   const ovFuel = selectedFilterValues("ovFuel");
@@ -691,6 +694,7 @@ function renderOverview() {
   rows.forEach(r=>{
     if (ovt === "__other__" ? Boolean(r.tier) : ovt !== "__all__" && r.tier !== ovt) return;
     if (ovc !== "__all__" && r.country !== ovc) return;
+    if (ovi !== "__all__" && r.importer !== ovi) return;
     if (ovMake.size && !ovMake.has(r.make)) return;
     if (ovBody.size && !ovBody.has(r.body)) return;
     if (ovFuel.size && !ovFuel.has(r.fuel)) return;

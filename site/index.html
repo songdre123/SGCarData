@@ -84,6 +84,11 @@
         </label>
         <select id="ovTier"><option value="__all__">All tiers</option></select>
         <select id="ovCountry"><option value="__all__">All countries</option></select>
+        <select id="ovImporter" aria-label="Importer filter">
+          <option value="__all__">AMD &amp; PI</option>
+          <option value="AMD">AMD (Official)</option>
+          <option value="PI">PI (Parallel)</option>
+        </select>
         <select id="ovMake" multiple size="1" aria-label="Make filter" title="Select multiple with Ctrl/Cmd-click. No selection shows all makes.">
           <option value="" disabled selected>All makes</option>
         </select>
@@ -247,7 +252,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="ui.js"></script>
-<script src="app.js?v=16"></script>
+<script src="app.js?v=17"></script>
 <script>
 // hamburger responsive fix
 (function(){
