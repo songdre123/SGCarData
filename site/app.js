@@ -7,6 +7,7 @@ let MONTHS = [];
 let LATEST = "";
 let SCOPE = { year: "__all__", month: "__all__" };
 let OVERVIEW_SORT = { key: "u", direction: "desc" };
+let BMW_SIME_SHARE = 60;
 let monthlyChart = null;
 let fuelChart = null;
 let bodyChart = null;
@@ -123,7 +124,6 @@ function initScope() {
   $("ovYearFilter").hidden = y.value !== "__all__";
   refreshMonthOptions();
   $("scopeMonth").addEventListener("change", () => { SCOPE.month = $("scopeMonth").value; render(); });
-  $("monthlyGroup").addEventListener("change", render);
 }
 
 
@@ -226,6 +226,36 @@ function initFilters() {
     MONTHS.forEach((x) => tmm.add(new Option(x, x)));
     tmm.addEventListener("change", renderMakeChart);
   }
+  const monthlyMake = $("monthlyMake");
+  const monthlyMonth = $("monthlyMonth");
+  if (monthlyMonth) {
+    MONTHS.forEach((month) => monthlyMonth.add(new Option(month, month)));
+    monthlyMonth.addEventListener("change", renderMonthlyBar);
+  }
+  if (monthlyMake) {
+    [...new Set(ALL.map((r) => r.make).filter(Boolean))].sort().forEach((make) => {
+      monthlyMake.add(new Option(make, make));
+    });
+    monthlyMake.addEventListener("change", renderMonthlyBar);
+  }
+  ["monthlyGroup", "monthlyImporter", "monthlyFuel", "monthlyBody"].forEach((id) => {
+    const filter = $(id);
+    if (filter) filter.addEventListener("change", renderMonthlyBar);
+  });
+  const monthlyFuel = $("monthlyFuel");
+  if (monthlyFuel) {
+    [...new Set(ALL.map((r) => r.fuel).filter(Boolean))].sort().forEach((fuel) => {
+      monthlyFuel.add(new Option(fuel, fuel));
+    });
+  }
+  const bmwSimeShare = $("bmwSimeShare");
+  if (bmwSimeShare) {
+    bmwSimeShare.addEventListener("input", () => {
+      BMW_SIME_SHARE = Number(bmwSimeShare.value);
+      $("bmwSimeShareValue").textContent = `${BMW_SIME_SHARE}% SIME / ${100 - BMW_SIME_SHARE}% EUROKARS`;
+      renderDistributorTable();
+    });
+  }
   // Last update
   if ($("lastUpdate")) $("lastUpdate").textContent = "Updated " + LATEST;
 
@@ -292,6 +322,7 @@ function render() {
   renderFuelChart();
   renderBodyChart();
   renderMakeChart();
+  renderDistributorTable();
   renderTable();
   renderOverview();
 }
@@ -317,7 +348,18 @@ function getColor(index) {
 function renderMonthlyBar() {
   const ctx = $("monthlyChart");
   if (!ctx) return;
-  const rows = scopeRows();
+  const month = $("monthlyMonth")?.value || "__all__";
+  let rows = month === "__all__" ? scopeRows() : ALL.filter((r) => r.m === month);
+  const make = $("monthlyMake")?.value || "__all__";
+  const importer = $("monthlyImporter")?.value || "__all__";
+  const fuel = $("monthlyFuel")?.value || "__all__";
+  const body = $("monthlyBody")?.value || "__all__";
+  rows = rows.filter((r) =>
+    (make === "__all__" || r.make === make) &&
+    (importer === "__all__" || r.importer === importer) &&
+    (fuel === "__all__" || r.fuel === fuel) &&
+    (body === "__all__" || r.body === body)
+  );
   if (!rows.length) {
     if (monthlyChart) { monthlyChart.destroy(); monthlyChart = null; }
     return;
@@ -512,11 +554,10 @@ function renderBodyChart() {
 function renderMakeChart() {
   const ctx = $("makeChart");
   if (!ctx) return;
-  let rows = scopeRows();
   const monthSel = $("topMakeMonth");
-  if (monthSel && monthSel.value !== "__all__") {
-    rows = rows.filter((r) => r.m === monthSel.value);
-  }
+  const rows = monthSel && monthSel.value !== "__all__"
+    ? ALL.filter((r) => r.m === monthSel.value)
+    : scopeRows();
   const totals = {};
   rows.forEach((r) => { totals[r.make] = (totals[r.make] || 0) + (r.u || 0); });
   const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 15);
@@ -558,6 +599,40 @@ function renderMakeChart() {
 
   if (makeChart) makeChart.destroy();
   makeChart = new Chart(ctx, config);
+}
+
+function renderDistributorTable() {
+  const table = $("distributorTable");
+  if (!table) return;
+  const rows = scopeRows();
+  const jointBMW = "EUROKARS AUTO / SIME MOTORS";
+  const totals = {};
+  let jointBMWUnits = 0;
+  let totalUnits = 0;
+  rows.forEach((row) => {
+    const units = row.u || 0;
+    totalUnits += units;
+    if (row.make === "BMW" && row.distributor === jointBMW) {
+      jointBMWUnits += units;
+      return;
+    }
+    const distributor = row.distributor || "PARALLEL IMPORT (PI)";
+    totals[distributor] = (totals[distributor] || 0) + units;
+  });
+
+  const simeUnits = Math.round(jointBMWUnits * BMW_SIME_SHARE / 100);
+  totals["SIME MOTORS"] = (totals["SIME MOTORS"] || 0) + simeUnits;
+  totals["EUROKARS AUTO"] = (totals["EUROKARS AUTO"] || 0) + jointBMWUnits - simeUnits;
+
+  const ranked = Object.entries(totals)
+    .map(([distributor, units]) => ({ distributor, units, share: totalUnits ? units / totalUnits * 100 : 0 }))
+    .sort((a, b) => b.units - a.units || a.distributor.localeCompare(b.distributor));
+  pagedTable(table, ranked, [
+    { get: (_, index) => index + 1 },
+    { get: (row) => row.distributor },
+    { get: (row) => row.units, num: 1, sum: 1 },
+    { get: (row) => row.share, num: 1, dec: 1, suf: "%" },
+  ], { reset: true });
 }
 
 function renderTable() {

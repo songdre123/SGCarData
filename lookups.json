@@ -1,359 +1,364 @@
 {
-  "distributor": {
-    "ALFA ROMEO|AMD": "RED ROCK & ROSSO MOTOR",
-    "ALPINE|AMD": "WEARNES AUTOMOTIVE",
-    "ASTON MARTIN|AMD": "WEARNES AUTOMOTIVE",
-    "AUDI|AMD": "AUDI SINGAPORE",
-    "AVATR|AMD": "PREMIUM AUTOMOBILES",
-    "BENTLEY|AMD": "WEARNES AUTOMOTIVE",
-    "BMW|AMD": "EUROKARS AUTO / SIME MOTORS",
-    "BYD|AMD": "SIME MOTORS",
-    "CHERY|AMD": "VERTEX AUTOMOBILES",
-    "CHEVROLET|AMD": "ALPINE MOTORS",
-    "CITROEN|AMD": "CYCLE & CARRIAGE",
-    "CUPRA|AMD": "VOLKSWAGEN SINGAPORE",
-    "DEEPAL|AMD": "PREMIUM AUTOMOBILES",
-    "DONGFENG|AMD": "VOLT AUTO",
-    "EVEASY|AMD": "VOLT AUTO",
-    "FERRARI|AMD": "KOMOCO MOTORS",
-    "FORD|AMD": "SIME MOTORS",
-    "GAC|AMD": "VINCAR GROUP",
-    "GEELY (PROTON)|AMD": "VINCAR GROUP",
-    "GREAT WALL|AMD": "CYCLE & CARRIAGE",
-    "HONDA|AMD": "KAH MOTOR SDN BHD",
-    "HONGNQI|AMD": "EUROKARS AUTO",
-    "HYUNDAI|AMD": "KOMOCO MOTORS",
-    "JAGUAR|AMD": "WEARNES AUTOMOTIVE",
-    "JEEP|AMD": "RED ROCK & ROSSO MOTOR",
-    "KGM|AMD": "MOTORWAY",
-    "KIA|AMD": "CYCLE & CARRIAGE",
-    "LAMBORGHINI|AMD": "EUROSPORTS AUTO",
-    "LAND ROVER|AMD": "WEARNES AUTOMOTIVE",
-    "LEAPMOTOR|AMD": "CYCLE & CARRIAGE",
-    "LOTUS|AMD": "WEARNES AUTOMOTIVE",
-    "MASERATI|AMD": "KOMOCO MOTORS",
-    "MAXUS|AMD": "CYCLE & CARRIAGE",
-    "MAZDA|AMD": "EUROKARS AUTO",
-    "MCLAREN|AMD": "EUROKARS AUTO",
-    "MERCEDES BENZ|AMD": "CYCLE & CARRIAGE",
-    "MG|AMD": "EUROKARS AUTO",
-    "MINI|AMD": "EUROKARS AUTO",
-    "NIO|AMD": "WEARNES AUTOMOTIVE",
-    "NISSAN|AMD": "TAN CHONG MOTOR",
-    "OPEL|AMD": "ALPINE MOTORS",
-    "PEUGEOT|AMD": "CYCLE & CARRIAGE",
-    "POLESTAR|AMD": "WEARNES AUTOMOTIVE",
-    "PORSCHE|AMD": "PORSCHE SINGAPORE",
-    "ROLLS ROYCE|AMD": "EUROKARS AUTO",
-    "SERES|AMD": "HONG SEH",
-    "SKODA|AMD": "VOLKSWAGEN SINGAPORE",
-    "SKYWORTH|AMD": "SKYWORTH EV",
-    "SMART|AMD": "CYCLE & CARRIAGE",
-    "SUBARU|AMD": "TAN CHONG MOTOR",
-    "SUZUKI|AMD": "BORNEO MOTORS",
-    "TESLA|AMD": "TESLA SINGAPORE",
-    "TOYOTA|AMD": "BORNEO MOTORS",
-    "VOLKSWAGEN|AMD": "VOLKSWAGEN SINGAPORE",
-    "VOLVO|AMD": "WEARNES AUTOMOTIVE",
-    "XPENG|AMD": "PREMIUM AUTOMOBILES",
-    "ZEEKR|AMD": "PREMIUM AUTOMOBILES"
+ "distributor": {
+  "ALFA ROMEO|AMD": "RED ROCK & ROSSO MOTOR",
+  "ALPINE|AMD": "WEARNES AUTOMOTIVE",
+  "ASTON MARTIN|AMD": "WEARNES AUTOMOTIVE",
+  "AUDI|AMD": "AUDI SINGAPORE",
+  "AVATR|AMD": "PREMIUM AUTOMOBILES",
+  "BENTLEY|AMD": "WEARNES AUTOMOTIVE",
+  "BMW|AMD": "EUROKARS AUTO / SIME MOTORS",
+  "BYD|AMD": "SIME MOTORS",
+  "CHERY|AMD": "VERTEX AUTOMOBILES",
+  "CHEVROLET|AMD": "ALPINE MOTORS",
+  "CITROEN|AMD": "CYCLE & CARRIAGE",
+  "CUPRA|AMD": "VOLKSWAGEN SINGAPORE",
+  "DEEPAL|AMD": "PREMIUM AUTOMOBILES",
+  "DONGFENG|AMD": "VOLT AUTO",
+  "EVEASY|AMD": "VOLT AUTO",
+  "FERRARI|AMD": "KOMOCO MOTORS",
+  "FORD|AMD": "SIME MOTORS",
+  "GAC|AMD": "VINCAR GROUP",
+  "GEELY (PROTON)|AMD": "VINCAR GROUP",
+  "GEELY|PI": "VINCAR GROUP",
+  "GREAT WALL|AMD": "CYCLE & CARRIAGE",
+  "HONDA|AMD": "KAH MOTOR SDN BHD",
+  "HONGNQI|AMD": "EUROKARS AUTO",
+  "HYUNDAI|AMD": "KOMOCO MOTORS",
+  "JAGUAR|AMD": "WEARNES AUTOMOTIVE",
+  "JEEP|AMD": "RED ROCK & ROSSO MOTOR",
+  "KGM|AMD": "MOTORWAY",
+  "KIA|AMD": "CYCLE & CARRIAGE",
+  "LAMBORGHINI|AMD": "EUROSPORTS AUTO",
+  "LAND ROVER|AMD": "WEARNES AUTOMOTIVE",
+  "LEAPMOTOR|AMD": "CYCLE & CARRIAGE",
+  "LOTUS|AMD": "WEARNES AUTOMOTIVE",
+  "MASERATI|AMD": "KOMOCO MOTORS",
+  "MAXUS|AMD": "CYCLE & CARRIAGE",
+  "MAZDA|AMD": "EUROKARS AUTO",
+  "MCLAREN|AMD": "EUROKARS AUTO",
+  "MERCEDES BENZ|AMD": "CYCLE & CARRIAGE",
+  "MG|AMD": "EUROKARS AUTO",
+  "MINI|AMD": "EUROKARS AUTO",
+  "NIO|AMD": "WEARNES AUTOMOTIVE",
+  "NISSAN|AMD": "TAN CHONG MOTOR",
+  "OPEL|AMD": "ALPINE MOTORS",
+  "PEUGEOT|AMD": "CYCLE & CARRIAGE",
+  "POLESTAR|AMD": "WEARNES AUTOMOTIVE",
+  "PORSCHE|AMD": "PORSCHE SINGAPORE",
+  "ROLLS ROYCE|AMD": "EUROKARS AUTO",
+  "SERES|AMD": "HONG SEH",
+  "SKODA|AMD": "VOLKSWAGEN SINGAPORE",
+  "SKYWORTH|AMD": "SKYWORTH EV",
+  "SMART|AMD": "CYCLE & CARRIAGE",
+  "SUBARU|AMD": "TAN CHONG MOTOR",
+  "SUZUKI|AMD": "BORNEO MOTORS",
+  "TESLA|AMD": "TESLA SINGAPORE",
+  "TOYOTA|AMD": "BORNEO MOTORS",
+  "VOLKSWAGEN|AMD": "VOLKSWAGEN SINGAPORE",
+  "VOLVO|AMD": "WEARNES AUTOMOTIVE",
+  "XPENG|AMD": "PREMIUM AUTOMOBILES",
+  "ZEEKR|AMD": "PREMIUM AUTOMOBILES"
+ },
+ "make": {
+  "ALFA ROMEO": {
+   "country": "Other",
+   "tier": "Premium"
   },
-  "make": {
-    "ALFA ROMEO": {
-      "country": "Other",
-      "tier": "Premium"
-    },
-    "ALPINE": {
-      "country": "Other",
-      "tier": "Premium"
-    },
-    "ASTON MARTIN": {
-      "country": "Other",
-      "tier": "Luxury"
-    },
-    "AUDI": {
-      "country": "German",
-      "tier": "Premium"
-    },
-    "AUSTIN": {
-      "country": "Other",
-      "tier": ""
-    },
-    "AVATR": {
-      "country": "Chinese",
-      "tier": "Premium"
-    },
-    "BENTLEY": {
-      "country": "Other",
-      "tier": "Luxury"
-    },
-    "BMW": {
-      "country": "German",
-      "tier": "Premium"
-    },
-    "BUICK": {
-      "country": "American",
-      "tier": ""
-    },
-    "BYD": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "CHERY": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "CHEVROLET": {
-      "country": "American",
-      "tier": ""
-    },
-    "CHRYSLER": {
-      "country": "American",
-      "tier": ""
-    },
-    "CITROEN": {
-      "country": "Other",
-      "tier": ""
-    },
-    "CUPRA": {
-      "country": "Other",
-      "tier": ""
-    },
-    "DAIMLER": {
-      "country": "Other",
-      "tier": ""
-    },
-    "DATSUN": {
-      "country": "Japanese",
-      "tier": ""
-    },
-    "DEEPAL": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "DONGFENG": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "EVEASY": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "FERRARI": {
-      "country": "Other",
-      "tier": "Luxury"
-    },
-    "FORD": {
-      "country": "Other",
-      "tier": ""
-    },
-    "GAC": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "GEELY": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "GEELY (PROTON)": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "GREAT WALL": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "HONDA": {
-      "country": "Japanese",
-      "tier": ""
-    },
-    "HONGQI": {
-      "country": "Chinese",
-      "tier": "Premium"
-    },
-    "HYUNDAI": {
-      "country": "Korean",
-      "tier": ""
-    },
-    "JAGUAR": {
-      "country": "Other",
-      "tier": "Premium"
-    },
-    "JEEP": {
-      "country": "American",
-      "tier": ""
-    },
-    "KGM": {
-      "country": "Korean",
-      "tier": ""
-    },
-    "KIA": {
-      "country": "Korean",
-      "tier": ""
-    },
-    "LAMBORGHINI": {
-      "country": "Other",
-      "tier": "Luxury"
-    },
-    "LANCIA": {
-      "country": "Other",
-      "tier": ""
-    },
-    "LAND ROVER": {
-      "country": "Other",
-      "tier": "Premium"
-    },
-    "LEAPMOTOR": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "LOTUS": {
-      "country": "Chinese",
-      "tier": "Luxury"
-    },
-    "MASERATI": {
-      "country": "Other",
-      "tier": "Luxury"
-    },
-    "MAXUS": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "MAZDA": {
-      "country": "Japanese",
-      "tier": ""
-    },
-    "MCLAREN": {
-      "country": "Other",
-      "tier": "Luxury"
-    },
-    "MERCEDES BENZ": {
-      "country": "German",
-      "tier": "Premium"
-    },
-    "MG": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "MINI": {
-      "country": "Other",
-      "tier": "Premium"
-    },
-    "MITSUBISHI": {
-      "country": "Japanese",
-      "tier": ""
-    },
-    "MORGAN": {
-      "country": "Other",
-      "tier": ""
-    },
-    "NASH": {
-      "country": "American",
-      "tier": ""
-    },
-    "NETA": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "NIO": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "NISSAN": {
-      "country": "Japanese",
-      "tier": ""
-    },
-    "OPEL": {
-      "country": "German",
-      "tier": ""
-    },
-    "PANTHER": {
-      "country": "Other",
-      "tier": ""
-    },
-    "PEUGEOT": {
-      "country": "Other",
-      "tier": ""
-    },
-    "POLESTAR": {
-      "country": "Other",
-      "tier": ""
-    },
-    "PORSCHE": {
-      "country": "German",
-      "tier": "Premium"
-    },
-    "RANGE ROVER": {
-      "country": "Other",
-      "tier": ""
-    },
-    "ROLLS ROYCE": {
-      "country": "Other",
-      "tier": "Luxury"
-    },
-    "SAAB": {
-      "country": "Other",
-      "tier": ""
-    },
-    "SEAT": {
-      "country": "Other",
-      "tier": ""
-    },
-    "SERES": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "SKODA": {
-      "country": "German",
-      "tier": ""
-    },
-    "SKYWORTH": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "SMART": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "SSANGYONG": {
-      "country": "Korean",
-      "tier": ""
-    },
-    "SUBARU": {
-      "country": "Japanese",
-      "tier": ""
-    },
-    "SUZUKI": {
-      "country": "Japanese",
-      "tier": ""
-    },
-    "TESLA": {
-      "country": "American",
-      "tier": "Premium"
-    },
-    "TOYOTA": {
-      "country": "Japanese",
-      "tier": ""
-    },
-    "TRIUMPH": {
-      "country": "Other",
-      "tier": ""
-    },
-    "VOLKSWAGEN": {
-      "country": "German",
-      "tier": ""
-    },
-    "VOLVO": {
-      "country": "Other",
-      "tier": "Premium"
-    },
-    "XPENG": {
-      "country": "Chinese",
-      "tier": ""
-    },
-    "ZEEKR": {
-      "country": "Chinese",
-      "tier": ""
-    }
+  "ALPINE": {
+   "country": "Other",
+   "tier": "Premium"
+  },
+  "ASTON MARTIN": {
+   "country": "Other",
+   "tier": "Luxury"
+  },
+  "AUDI": {
+   "country": "German",
+   "tier": "Premium"
+  },
+  "AUSTIN": {
+   "country": "Other",
+   "tier": ""
+  },
+  "AVATR": {
+   "country": "Chinese",
+   "tier": "Premium"
+  },
+  "BENTLEY": {
+   "country": "Other",
+   "tier": "Luxury"
+  },
+  "BMW": {
+   "country": "German",
+   "tier": "Premium"
+  },
+  "BUICK": {
+   "country": "American",
+   "tier": ""
+  },
+  "BYD": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "CHERY": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "CHEVROLET": {
+   "country": "American",
+   "tier": ""
+  },
+  "CHRYSLER": {
+   "country": "American",
+   "tier": ""
+  },
+  "CITROEN": {
+   "country": "Other",
+   "tier": ""
+  },
+  "CUPRA": {
+   "country": "Other",
+   "tier": ""
+  },
+  "DAIMLER": {
+   "country": "Other",
+   "tier": ""
+  },
+  "DATSUN": {
+   "country": "Japanese",
+   "tier": ""
+  },
+  "DEEPAL": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "DONGFENG": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "EVEASY": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "FERRARI": {
+   "country": "Other",
+   "tier": "Luxury"
+  },
+  "FORD": {
+   "country": "Other",
+   "tier": ""
+  },
+  "GAC": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "GEELY": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "GEELY (PROTON)": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "GREAT WALL": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "HONDA": {
+   "country": "Japanese",
+   "tier": ""
+  },
+  "HONGQI": {
+   "country": "Chinese",
+   "tier": "Premium"
+  },
+  "HYUNDAI": {
+   "country": "Korean",
+   "tier": ""
+  },
+  "JAGUAR": {
+   "country": "Other",
+   "tier": "Premium"
+  },
+  "JEEP": {
+   "country": "American",
+   "tier": ""
+  },
+  "KGM": {
+   "country": "Korean",
+   "tier": ""
+  },
+  "KIA": {
+   "country": "Korean",
+   "tier": ""
+  },
+  "LAMBORGHINI": {
+   "country": "Other",
+   "tier": "Luxury"
+  },
+  "LANCIA": {
+   "country": "Other",
+   "tier": ""
+  },
+  "LAND ROVER": {
+   "country": "Other",
+   "tier": "Premium"
+  },
+  "LEAPMOTOR": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "LOTUS": {
+   "country": "Chinese",
+   "tier": "Luxury"
+  },
+  "MASERATI": {
+   "country": "Other",
+   "tier": "Luxury"
+  },
+  "MAXUS": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "MAZDA": {
+   "country": "Japanese",
+   "tier": ""
+  },
+  "MCLAREN": {
+   "country": "Other",
+   "tier": "Luxury"
+  },
+  "MERCEDES BENZ": {
+   "country": "German",
+   "tier": "Premium"
+  },
+  "MG": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "MINI": {
+   "country": "Other",
+   "tier": "Premium"
+  },
+  "MITSUBISHI": {
+   "country": "Japanese",
+   "tier": ""
+  },
+  "MORGAN": {
+   "country": "Other",
+   "tier": ""
+  },
+  "NASH": {
+   "country": "American",
+   "tier": ""
+  },
+  "NETA": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "NIO": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "NISSAN": {
+   "country": "Japanese",
+   "tier": ""
+  },
+  "OPEL": {
+   "country": "German",
+   "tier": ""
+  },
+  "PANTHER": {
+   "country": "Other",
+   "tier": ""
+  },
+  "PEUGEOT": {
+   "country": "Other",
+   "tier": ""
+  },
+  "POLESTAR": {
+   "country": "Other",
+   "tier": ""
+  },
+  "PORSCHE": {
+   "country": "German",
+   "tier": "Premium"
+  },
+  "PROTON": {
+   "country": "Unknown",
+   "tier": ""
+  },
+  "RANGE ROVER": {
+   "country": "Other",
+   "tier": ""
+  },
+  "ROLLS ROYCE": {
+   "country": "Other",
+   "tier": "Luxury"
+  },
+  "SAAB": {
+   "country": "Other",
+   "tier": ""
+  },
+  "SEAT": {
+   "country": "Other",
+   "tier": ""
+  },
+  "SERES": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "SKODA": {
+   "country": "German",
+   "tier": ""
+  },
+  "SKYWORTH": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "SMART": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "SSANGYONG": {
+   "country": "Korean",
+   "tier": ""
+  },
+  "SUBARU": {
+   "country": "Japanese",
+   "tier": ""
+  },
+  "SUZUKI": {
+   "country": "Japanese",
+   "tier": ""
+  },
+  "TESLA": {
+   "country": "American",
+   "tier": "Premium"
+  },
+  "TOYOTA": {
+   "country": "Japanese",
+   "tier": ""
+  },
+  "TRIUMPH": {
+   "country": "Other",
+   "tier": ""
+  },
+  "VOLKSWAGEN": {
+   "country": "German",
+   "tier": ""
+  },
+  "VOLVO": {
+   "country": "Other",
+   "tier": "Premium"
+  },
+  "XPENG": {
+   "country": "Chinese",
+   "tier": ""
+  },
+  "ZEEKR": {
+   "country": "Chinese",
+   "tier": ""
   }
+ }
 }

@@ -140,6 +140,7 @@
             <option value="fuel">Fuel Type</option>
           </select>
         </label>
+        <select id="monthlyMonth"><option value="__all__">All months</option></select>
         <select id="monthlyMake"><option value="__all__">All makes</option></select>
         <select id="monthlyImporter"><option value="__all__">AMD &amp; PI</option><option value="AMD">AMD (Official)</option><option value="PI">PI (Parallel)</option></select>
         <select id="monthlyFuel"><option value="__all__">All fuels</option></select>
@@ -161,6 +162,26 @@
         </select>
       </div>
       <div class="chart-wrap" style="height: min(45vh, 420px);"><canvas id="makeChart"></canvas></div>
+    </div>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Distributor Rankings</h2>
+      <button class="panel-toggle" type="button" aria-expanded="true" aria-label="Collapse Distributor Rankings"><span aria-hidden="true">⌄</span></button>
+    </summary>
+    <div class="panel-content">
+      <div class="filters distributor-controls">
+        <label for="bmwSimeShare">BMW shared registrations assigned to SIME</label>
+        <input id="bmwSimeShare" type="range" min="0" max="100" step="1" value="60">
+        <output id="bmwSimeShareValue" for="bmwSimeShare" aria-live="polite">60% SIME / 40% EUROKARS</output>
+      </div>
+      <div class="table-wrap">
+        <table id="distributorTable">
+          <thead><tr><th>Rank</th><th>Distributor</th><th>Units</th><th>% of total</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </details>
 
@@ -226,7 +247,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="ui.js"></script>
-<script src="app.js?v=13"></script>
+<script src="app.js?v=16"></script>
 <script>
 // hamburger responsive fix
 (function(){

@@ -155,6 +155,9 @@ main { max-width: 1300px; margin: 0 auto; padding: 20px; }
   background: var(--accent);
 }
 .filters input { accent-color: var(--accent); }
+.distributor-controls { margin-bottom: 12px; }
+.distributor-controls input[type="range"] { width: min(220px, 100%); padding: 0; accent-color: var(--accent); }
+.distributor-controls output { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
 
 .split {
   display: grid;
