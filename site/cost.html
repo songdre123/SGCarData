@@ -26,6 +26,7 @@
     <a class="nav-link active" href="cost.html">Cost Tracker</a>
     <a class="nav-link" href="explorer.html?t=pop">Population</a>
     <a class="nav-link" href="explorer.html?t=trf">Transfers</a>
+    <a class="nav-link" href="commercial.html">Commercial vehicles</a>
     <a class="nav-link" href="coe.html">COE</a>
     <a class="nav-link" href="blog.html">Blog</a>
   </nav>
@@ -45,6 +46,8 @@
         <select id="costModel"><option value="__all__">All models</option></select>
         <select id="costFuel"><option value="__all__">All fuels</option></select>
         <select id="costCat"><option value="__all__">All COE categories</option></select>
+        <input type="number" id="costOmvMin" min="0" step="1000" inputmode="numeric" aria-label="Minimum OMV" placeholder="Min OMV">
+        <input type="number" id="costOmvMax" min="0" step="1000" inputmode="numeric" aria-label="Maximum OMV" placeholder="Max OMV">
         <input type="search" id="costSearch" placeholder="Search model…">
         <button class="btn ghost" id="costReset">Reset</button>
       </div>
@@ -56,12 +59,19 @@
     <summary class="panel-head">
       <h2>Cost Overview</h2>
       <div class="filters" id="costChartFilters">
+        <label>From <select id="costChartFrom" aria-label="Cost Overview start month"></select></label>
+        <label>To <select id="costChartTo" aria-label="Cost Overview end month"></select></label>
+        <select id="costChartCars" multiple size="1" aria-label="Select cars for Cost Overview chart" title="Select multiple cars with Ctrl/Cmd-click. No selection shows the top 40 cars for the end month.">
+          <option value="" disabled selected>Select cars (optional)</option>
+        </select>
+        <label><input type="checkbox" value="omv" checked> OMV</label>
         <label><input type="checkbox" value="basic_with_coe" checked> Basic (with COE)</label>
         <label><input type="checkbox" value="price_with_coe" checked> Price (with COE)</label>
         <label><input type="checkbox" value="basic_ex_coe"> Basic (ex COE)</label>
         <label><input type="checkbox" value="price_ex_coe"> Price (ex COE)</label>
       </div>
     </summary>
+    <p class="table-note" id="costChartNote"></p>
     <div class="chart-wrap"><canvas id="costChart"></canvas></div>
   </details>
 
@@ -82,6 +92,18 @@
       </table>
     </div>
   </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>OMV Over Time</h2>
+      <div class="filters">
+        <select id="omvMake" aria-label="OMV chart make"><option value="">Choose make</option></select>
+        <select id="omvModel" aria-label="OMV chart model" disabled><option value="">Choose model</option></select>
+      </div>
+    </summary>
+    <p class="table-note" id="omvNote">Choose a make and model to display its monthly OMV history.</p>
+    <div class="chart-wrap" id="omvChartWrap" hidden><canvas id="omvChart"></canvas></div>
+  </details>
 </main>
 
 <footer class="topbar">
@@ -89,7 +111,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="cost.js"></script>
+<script src="cost.js?v=4"></script>
 <script>
 // hamburger responsive fix
 (function(){

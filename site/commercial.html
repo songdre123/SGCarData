@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Explore Singapore LTA commercial vehicle population and new registrations by make.">
+<title>SG Car Data: commercial vehicles</title><link rel="stylesheet" href="styles.css?v=2"></head>
+<body>
+<header class="topbar"><button class="hamburger" aria-label="Menu" onclick="document.body.classList.toggle('menu-open')">☰</button><div class="brand"><h1>SG Car Data Dashboard</h1><p class="sub">Singapore LTA commercial vehicle population and registrations</p></div>
+<nav class="header-nav">
+    <button class="menu-close" aria-label="Close" onclick="document.body.classList.remove('menu-open')">✕</button><a class="nav-link" href="index.html">Registrations Tracker</a><a class="nav-link" href="cost.html">Cost Tracker</a><a class="nav-link" href="explorer.html?t=pop">Population</a><a class="nav-link" href="explorer.html?t=trf">Transfers</a><a class="nav-link active" href="commercial.html">Commercial vehicles</a>
+    <a class="nav-link" href="coe.html">COE</a><a class="nav-link" href="blog.html">Blog</a></nav><div class="header-actions"></div></header>
+<main>
+<section class="panel"><div class="panel-head"><h2 id="title">Loading</h2>
+ <div class="filters"><select id="view" aria-label="Data view"><option value="population">Population</option><option value="annual">Annual registrations</option><option value="monthly" selected>Monthly registrations</option></select><select id="chartPeriod" aria-label="Chart period"></select><input type="search" id="search" placeholder="Search make"></div></div>
+ <p class="table-note" id="note"></p>
+ <div class="chart-wrap" style="height:min(60vh,520px)"><canvas id="c1"></canvas></div></section>
+<section class="panel"><div class="panel-head"><h2>Commercial vehicle data</h2></div>
+ <div class="table-tools">
+  <select id="tableYear" aria-label="Year filter"><option value="__all__">All years</option></select>
+  <select id="tableMonth" aria-label="Month filter" hidden><option value="__ytd__" selected>Year to date</option></select>
+  <select id="tableMake" multiple size="1" aria-label="Make filter" title="Select multiple with Ctrl/Cmd-click. No selection shows all makes."><option value="" disabled selected>All makes</option></select>
+  <select id="tableFuel" multiple size="1" aria-label="Propellant filter" title="Select multiple with Ctrl/Cmd-click. No selection shows all propellants."><option value="" disabled selected>All propellants</option></select>
+  <input type="search" id="tableSearch" placeholder="Search make or propellant">
+  <button class="btn ghost" id="resetFilters" type="button">Reset</button>
+ </div>
+ <div class="table-wrap"><table id="tbl"><thead><tr id="tableHeads"></tr></thead><tbody></tbody></table></div>
+ <p class="table-note" id="tableNote"></p></section>
+</main>
+<footer class="topbar"><p>Source: Singapore Land Transport Authority (LTA), Annual and Monthly Vehicle Statistics. Commercial vehicles include goods vehicles and buses.</p></footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script><script src="ui.js"></script><script src="commercial.js?v=5"></script>
+<script>
+(function(){
+  function updateHamburger() {
+    var hb = document.querySelector('.hamburger');
+    var nav = document.querySelector('.header-nav');
+    if (!hb || !nav) return;
+    if (window.innerWidth > 900) {
+      hb.style.display = 'none';
+      nav.style.display = 'flex';
+      document.body.classList.remove('menu-open');
+    } else {
+      hb.style.display = 'inline-block';
+      if (!document.body.classList.contains('menu-open')) nav.style.display = 'none';
+    }
+  }
+  window.addEventListener('resize', updateHamburger);
+  updateHamburger();
+  var hb = document.querySelector('.hamburger');
+  if (hb) hb.onclick = function() {
+    document.body.classList.toggle('menu-open');
+    var nav = document.querySelector('.header-nav');
+    if (nav) nav.style.display = document.body.classList.contains('menu-open') ? 'flex' : 'none';
+  };
+  var mc = document.querySelector('.menu-close');
+  if (mc) mc.onclick = function() {
+    document.body.classList.remove('menu-open');
+    var nav = document.querySelector('.header-nav');
+    if (nav) nav.style.display = 'none';
+  };
+})();
+</script>
+</body></html>

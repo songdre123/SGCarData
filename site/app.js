@@ -12,6 +12,8 @@ let monthlyChart = null;
 let fuelChart = null;
 let bodyChart = null;
 let makeChart = null;
+let registrationTrendChart = null;
+let marketShareChart = null;
 
 async function load() {
   const meta = await (await fetch("data/meta.json")).json();
@@ -20,6 +22,7 @@ async function load() {
   ALL = await (await fetch("data/registrations.json")).json();
   initScope();
   initFilters();
+  initRegistrationTrendFilters();
   render();
 }
 function getCurrentYear() {
@@ -303,6 +306,13 @@ function initFilters() {
     });
   }
   addMultiFilterListener("ovFuel", renderOverview);
+  const shareMakes = $("shareMakes");
+  if (shareMakes) {
+    [...new Set(ALL.map((row) => row.make).filter(Boolean))]
+      .sort()
+      .forEach((make) => shareMakes.add(new Option(make, make)));
+    addMultiFilterListener("shareMakes", renderMarketShareChart);
+  }
   const overviewTable = $("overviewTable");
   if (overviewTable) {
     overviewTable.tHead.addEventListener("click", (event) => {
@@ -321,12 +331,225 @@ function initFilters() {
 function render() {
   renderKPIs();
   renderMonthlyBar();
+  renderRegistrationTrend();
+  renderMarketShareChart();
   renderFuelChart();
   renderBodyChart();
   renderMakeChart();
   renderDistributorTable();
   renderTable();
   renderOverview();
+}
+
+function initRegistrationTrendFilters() {
+  const from = $("trendFrom");
+  const to = $("trendTo");
+  const makesSelect = $("trendMakes");
+  MONTHS.forEach((month) => {
+    from.add(new Option(month, month));
+    to.add(new Option(month, month));
+  });
+  [...new Set(ALL.map((row) => row.make).filter(Boolean))]
+    .sort()
+    .forEach((make) => makesSelect.add(new Option(make, make)));
+  addMultiFilterListener("trendMakes", renderRegistrationTrend);
+  from.value = MONTHS[0] || "";
+  to.value = LATEST;
+  $("trendMode").addEventListener("change", () => {
+    const custom = $("trendMode").value === "custom";
+    $("trendFromLabel").hidden = !custom;
+    $("trendToLabel").hidden = !custom;
+    renderRegistrationTrend();
+    renderMarketShareChart();
+  });
+  $("trendValues").addEventListener("change", renderRegistrationTrend);
+  from.addEventListener("change", () => {
+    if (from.value > to.value) to.value = from.value;
+    renderRegistrationTrend();
+    renderMarketShareChart();
+  });
+  to.addEventListener("change", () => {
+    if (to.value < from.value) from.value = to.value;
+    renderRegistrationTrend();
+    renderMarketShareChart();
+  });
+  $("trendMode").value = "from_start";
+  $("trendFromLabel").hidden = true;
+  $("trendToLabel").hidden = true;
+}
+
+function getTrendMonths() {
+  const mode = $("trendMode").value;
+  if (mode === "current_year") {
+    return MONTHS.filter((month) => month.startsWith(LATEST.slice(0, 4)) && month <= LATEST);
+  }
+  if (mode === "custom") {
+    return MONTHS.filter((month) => month >= $("trendFrom").value && month <= $("trendTo").value);
+  }
+  return MONTHS.filter((month) => month <= LATEST);
+}
+
+function getMonthlyMakeTotals(months) {
+  const totals = new Map(months.map((month) => [month, new Map()]));
+  ALL.forEach((row) => {
+    const monthTotals = totals.get(row.m);
+    if (!monthTotals) return;
+    monthTotals.set(row.make, (monthTotals.get(row.make) || 0) + (row.u || 0));
+  });
+  return totals;
+}
+
+function renderRegistrationTrend() {
+  const canvas = $("registrationTrendChart");
+  if (!canvas) return;
+  const mode = $("trendMode").value;
+  const months = getTrendMonths();
+  const totals = getMonthlyMakeTotals(months);
+  const selectedMakes = selectedFilterValues("trendMakes");
+  const makes = selectedMakes.size
+    ? [...selectedMakes]
+    : [...ALL.reduce((makeTotals, row) => {
+        if (totals.has(row.m)) makeTotals.set(row.make, (makeTotals.get(row.make) || 0) + (row.u || 0));
+        return makeTotals;
+      }, new Map())]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 10)
+        .map(([make]) => make);
+  const datasets = makes.map((make, index) => {
+    let runningTotal = 0;
+    return {
+      label: make,
+      data: months.map((month) => {
+        const registrations = totals.get(month)?.get(make) || 0;
+        if ($("trendValues").value === "monthly") return registrations;
+        runningTotal += registrations;
+        return runningTotal;
+      }),
+      borderColor: getColor(index),
+      backgroundColor: getColor(index),
+      borderWidth: 2,
+      pointRadius: 2,
+      tension: 0.2,
+    };
+  });
+  if (registrationTrendChart) registrationTrendChart.destroy();
+  registrationTrendChart = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels: months,
+      datasets,
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { display: true, position: "bottom", labels: { color: "#9aa3bd" } },
+        tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${fmt(context.parsed.y)}` } },
+      },
+      scales: {
+        x: { ticks: { color: "#9aa3bd", maxRotation: 45 }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: "#9aa3bd" }, grid: { color: "#2c3557" } },
+      },
+    },
+  });
+  const descriptions = {
+    from_start: `Registrations by make from ${months[0]} through ${months.at(-1)}.`,
+    current_year: `Registrations by make from January through ${months.at(-1)} (${LATEST.slice(0, 4)}).`,
+    custom: `Registrations by make from ${months[0]} through ${months.at(-1)}.`,
+  };
+  const valueDescription = $("trendValues").value === "cumulative" ? "Cumulative totals." : "Monthly values.";
+  $("trendNote").textContent = `${descriptions[mode]} ${valueDescription} ${selectedMakes.size ? "Showing selected makes." : "Showing the top 10 makes in this period."}`;
+}
+
+function renderMarketShareChart() {
+  const canvas = $("marketShareChart");
+  if (!canvas) return;
+  const months = getTrendMonths();
+  const totals = getMonthlyMakeTotals(months);
+  const explicitMakes = selectedFilterValues("shareMakes");
+  const latestTotals = totals.get(months.at(-1)) || new Map();
+  const makes = explicitMakes.size
+    ? [...explicitMakes]
+    : [...latestTotals.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 8)
+        .map(([make]) => make);
+  const colors = makes.map((_, index) => getColor(index));
+  const datasets = makes.flatMap((make, index) => {
+    const registrations = months.map((month) => totals.get(month)?.get(make) || 0);
+    const marketShares = months.map((month) => {
+      const monthTotals = totals.get(month);
+      const marketTotal = [...(monthTotals?.values() || [])].reduce((sum, units) => sum + units, 0);
+      return marketTotal ? (monthTotals.get(make) || 0) / marketTotal * 100 : 0;
+    });
+    return [
+      {
+        type: "bar",
+        label: `${make} registrations`,
+        data: registrations,
+        backgroundColor: colors[index] + "99",
+        borderColor: colors[index],
+        borderWidth: 1,
+        stack: "registrations",
+        yAxisID: "y",
+      },
+      {
+        type: "line",
+        label: `${make} market share`,
+        data: marketShares,
+        borderColor: colors[index],
+        backgroundColor: colors[index],
+        borderWidth: 2,
+        pointRadius: 2,
+        tension: 0.15,
+        yAxisID: "yShare",
+      },
+    ];
+  });
+  if (marketShareChart) marketShareChart.destroy();
+  marketShareChart = new Chart(canvas, {
+    type: "bar",
+    data: { labels: months, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#9aa3bd" } },
+        tooltip: {
+          callbacks: {
+            label(context) {
+              const value = context.parsed.y ?? 0;
+              return context.dataset.yAxisID === "yShare"
+                ? `${context.dataset.label}: ${value.toFixed(1)}%`
+                : `${context.dataset.label}: ${fmt(value)}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: { stacked: true, ticks: { color: "#9aa3bd", maxRotation: 45 }, grid: { display: false } },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          position: "left",
+          title: { display: true, text: "Registrations", color: "#9aa3bd" },
+          ticks: { color: "#9aa3bd" },
+          grid: { color: "#2c3557" },
+        },
+        yShare: {
+          beginAtZero: true,
+          max: 100,
+          position: "right",
+          title: { display: true, text: "Market share", color: "#9aa3bd" },
+          ticks: { color: "#9aa3bd", callback: (value) => `${value}%` },
+          grid: { drawOnChartArea: false },
+        },
+      },
+    },
+  });
+  $("shareNote").textContent = `Stacked bars show selected makes' registrations; lines show their share of all registrations for each month. ${months.at(-1)} is the latest available month.`;
 }
 
 function renderKPIs() {

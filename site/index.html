@@ -31,6 +31,7 @@
     <a class="nav-link" href="cost.html">Cost Tracker</a>
     <a class="nav-link" href="explorer.html?t=pop">Population</a>
     <a class="nav-link" href="explorer.html?t=trf">Transfers</a>
+    <a class="nav-link" href="commercial.html">Commercial vehicles</a>
     <a class="nav-link" href="coe.html">COE</a>
     <a class="nav-link" href="blog.html">Blog</a>
   </nav>
@@ -157,6 +158,61 @@
 
   <details class="panel" open>
     <summary class="panel-head">
+      <h2>Registrations Over Time</h2>
+      <button class="panel-toggle" type="button" aria-expanded="true" aria-label="Collapse Registrations Over Time"><span aria-hidden="true">⌄</span></button>
+    </summary>
+    <div class="panel-content">
+      <div class="filters">
+        <label>Period
+          <select id="trendMode">
+            <option value="from_start">All available data</option>
+            <option value="current_year">Latest data year</option>
+            <option value="custom">Custom date range</option>
+          </select>
+        </label>
+        <label>Values
+          <select id="trendValues">
+            <option value="monthly">Monthly registrations</option>
+            <option value="cumulative">Cumulative registrations</option>
+          </select>
+        </label>
+        <label id="trendFromLabel" hidden>From
+          <select id="trendFrom"></select>
+        </label>
+        <label id="trendToLabel" hidden>To
+          <select id="trendTo"></select>
+        </label>
+        <label>Makes
+          <select id="trendMakes" multiple size="1" aria-label="Makes for registrations over time chart" title="Select multiple with Ctrl/Cmd-click. No selection shows the top 10 makes for the selected period.">
+            <option value="" disabled selected>Top 10 makes</option>
+          </select>
+        </label>
+      </div>
+      <p class="table-note" id="trendNote"></p>
+      <div class="chart-wrap" style="height: min(45vh, 360px);"><canvas id="registrationTrendChart"></canvas></div>
+    </div>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
+      <h2>Make Registrations &amp; Market Share</h2>
+      <button class="panel-toggle" type="button" aria-expanded="true" aria-label="Collapse Make Registrations & Market Share"><span aria-hidden="true">⌄</span></button>
+    </summary>
+    <div class="panel-content">
+      <div class="filters">
+        <label>Makes
+          <select id="shareMakes" multiple size="1" aria-label="Makes for registrations and market share chart" title="Select multiple with Ctrl/Cmd-click. No selection shows the top 8 makes in the period.">
+            <option value="" disabled selected>Top 8 makes</option>
+          </select>
+        </label>
+      </div>
+      <p class="table-note" id="shareNote"></p>
+      <div class="chart-wrap" style="height: min(55vh, 420px);"><canvas id="marketShareChart"></canvas></div>
+    </div>
+  </details>
+
+  <details class="panel" open>
+    <summary class="panel-head">
       <h2>Top Makes</h2>
       <button class="panel-toggle" type="button" aria-expanded="true" aria-label="Collapse Top Makes"><span aria-hidden="true">⌄</span></button>
     </summary>
@@ -252,7 +308,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="ui.js"></script>
-<script src="app.js?v=17"></script>
+<script src="app.js?v=20"></script>
 <script>
 // hamburger responsive fix
 (function(){

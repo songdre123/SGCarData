@@ -18,6 +18,10 @@ for pdf in sorted(list(INCOMING.glob("*.pdf")) + list(INCOMING.glob("*.csv"))):
         head = subprocess.run(["pdftotext", "-l", "1", str(pdf), "-"], capture_output=True, text=True).stdout.upper()
     if "QUOTA PREMIUM" in head and "BIDDING EXERCISE" in head:
         script = "parse_coe_csv.py"
+    elif "NEW REGISTRATION OF GOODS VEHICLES AND BUSES" in head:
+        script = "parse_commercial_pdf.py"
+    elif "POPULATION BY MAKE" in head and ("BUS" in head or "GOODS VEHICLE" in head):
+        script = "parse_commercial_pdf.py"
     elif "ANNUAL NEW REGISTRATION OF CARS" in head:
         script = "parse_newreg_pdf.py"
     elif "NEW REGISTRATION OF CARS BY MAKE" in head:
